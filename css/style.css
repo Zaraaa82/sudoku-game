@@ -95,6 +95,19 @@ main {
   color: black;
 }
 
+.cell.top-border {
+  border-top-color: var(--border-color);
+}
+.cell.right-border {
+  border-right-color: var(--border-color);
+}
+.cell.bottom-border {
+  border-bottom-color: var(--border-color);
+}
+
+.cell.left-border {
+  border-left-color: var(--border-color);
+}
 
 @media (425px < width <= 768px) {
   html {
