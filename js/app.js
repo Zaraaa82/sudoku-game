@@ -20,7 +20,10 @@ const puzzle = [
 ]
 
 /*---------------------------- Variables (state) ----------------------------*/
-
+let selectedCell = null;
+let selectedRow = -1;
+let selectedCol = -1;
+let selectedSameNumber = [];
 
 /*-------------------------------- Functions --------------------------------*/
 
@@ -33,8 +36,13 @@ function initializeGame(){
     fetchCells()
     addBoardBorders();
     loadPuzzle();
+    selectStartingCell();
 }
 
+function handleCellClick(clickedCell){
+     if(clickedCell !== selectedCell) 
+        setSelectedCell(clickedCell);
+}
 
 
 function fetchCells() {
@@ -74,7 +82,98 @@ function loadPuzzle(){
     })
 }
 
+function selectStartingCell(){
+    let firstSelect = cellEls.find(cell=> !cell.classList.contains('fixed'));
+    setSelectedCell(firstSelect);
+}
+
+function findSameNumber(){
+     if (!selectedCell.textContent) {
+        selectedSameNumber = [];
+        return;
+    }
+    selectedSameNumber = cellEls.filter(cell=> cell.textContent === selectedCell.textContent);
+}
+
+function setSelectedCell(cell){
+    if(selectedCell){
+        highlightSelectedCell();
+    }
+    selectedCell = cell;
+    [selectedRow,selectedCol] = selectedCell.id.split("-").map(Number);
+    findSameNumber();
+
+    highlightSelectedCell();
+}
+
+function highlightSelectedCell(){
+    // Selected cell
+    toggleCellClass(selectedCell, 'selected');
+
+    // Select box, row, and column
+    highlightRelatedCells();
+
+    // select same number
+    highlightSameNumber()
+}
+
+function highlightRelatedCells() {
+    boardCells.forEach((row, rowIndex)=>{
+        row.forEach((cell, colIndex)=>{
+            // Prevent highlighting the selected cell
+            if(rowIndex !== selectedRow || colIndex!==selectedCol){
+
+                if(isSameBox(rowIndex,colIndex)|| // Same Box
+                   rowIndex === selectedRow || // Same Row
+                   colIndex === selectedCol // Same Column
+                ){
+                    toggleCellClass(cell,"related-cell");
+                }
+
+            }
+        })
+    })
+}
+
+function highlightSameNumber(){
+    selectedSameNumber.forEach(cell => toggleCellClass(cell,'same-Number-color'));
+}
+
+
+
 /*------------------------------ Helper Functions ---------------------------*/
 function toggleCellClass(cell, className){
     cell.classList.toggle(className);
 }
+function isSameBox(row, col) {
+    return findSubBox(row, col) === findSubBox(selectedRow, selectedCol);
+}
+/**
+ * findSubBox()
+ * Determines which sub-box a cell belongs to.
+ * 
+ * The Sudoku board contains 9 sub-boxes arranged as:
+ *          col-0     col-1    Col-2
+ * Row-0:    0          1         2
+ * Row-1:    3          4         5
+ * Row-2:    6          7         8
+ * 
+ * Math.floor(cellRow / 3) determines the row of sub-boxes (0-2)
+ * Math.floor(cellCol / 3) determines the column of sub-boxes (0-2)
+ * 
+ * Each row of sub-boxes contains 3 sub-boxes, so multiplying
+ * the sub-box row by 3 gives the index of the first sub-box
+ * in that row (0, 3, or 6). 
+ * Adding the sub-box column (0–2) gives the final sub-box index (0–8).
+ */
+
+function findSubBox(cellRow, cellCol) {
+  return Math.floor(cellRow / 3) * 3 + Math.floor(cellCol / 3);
+}
+
+
+/*----------------------------- Event Listeners -----------------------------*/
+boardEl.addEventListener('click', event=>{
+    if (event.target.classList.contains("cell"))
+        handleCellClick(event.target); 
+})

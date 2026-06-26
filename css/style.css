@@ -122,6 +122,32 @@ main {
   color: var(--text-primary-color);
 }
 
+.cell.selected {
+  border-color: var(--primary-color);
+  background-color: var(--primary-light-color);
+  box-shadow: var(--box-shadow02);
+  border-radius: 1px;
+}
+
+.related-cell {
+  background-color: var(--row-col-color);
+}
+.same-Number-color {
+  background-color: var(--same-Number-color);
+}
+.cell.wrongNumber {
+  background-color: var(--error-light-color);
+  border-color: var(--error-color);
+  color: var(--error-color);
+  box-shadow: var(--box-shadow03);
+  border-radius: 1px;
+}
+
+.filled {
+  color: var(--primary-color);
+}
+
+
 /*-------------------------------- Responsive -------------------------------*/
 @media (425px < width <= 768px) {
   html {
