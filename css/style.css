@@ -1,0 +1,108 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Londrina+Shadow&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap");
+html {
+  font-size: 22px;
+}
+:root {
+  --primary-color: rgb(164, 109, 206);
+  --primary-light-color: rgb(196, 188, 255);
+  --primary-hover-color: rgb(173, 147, 244);
+  --primary-active-color: rgb(189, 147, 244);
+  --accent-color: rgb(255, 214, 231);
+  --accent-light-color: rgb(255, 234, 241);
+  --background-color: rgb(251, 247, 254);
+  --card-color: rgb(255, 255, 255);
+  --border-color: rgb(181, 175, 201);
+  --border-cell-color: rgba(198, 191, 219, 0.666);
+
+  /* State */
+  --success-color: rgb(179, 228, 201);
+  --success-light-color: rgb(224, 246, 235);
+  --error-color: rgb(255, 141, 141);
+  --error-light-color: rgb(249, 207, 217);
+  --row-col-color: rgba(245, 239, 255, 0.934);
+  --same-Number-color: #d6c5eb;
+
+  /* Text */
+  --text-primary-color: rgb(50, 48, 70);
+  --text-secondary-color: rgb(142, 138, 163);
+  --text-Inverse-color: rgb(255, 255, 255);
+
+  /* Box shadow */
+  --box-shadow01: 0px 2px 8px rgba(155, 155, 155, 0.2);
+  --box-shadow02: 0px 0px 10px 1.5px var(--primary-active-color);
+  --box-shadow03:  0px 0px 10px var(--error-color);
+}
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+
+  background-color: var(--background-color);
+  font-family: "Nunito", sans-serif, serif, system-ui, "Helvetica Neue";
+}
+header {
+  display: flex;
+  gap: 15px;
+}
+
+main {
+  height: 75vh;
+  width: 80vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--card-color);
+  border-radius: 15px;
+  box-shadow: var(--box-shadow01);
+}
+
+#board {
+  display: flex;
+  flex-direction: column;
+
+  background-color: var(--card-color);
+  box-shadow: var(--box-shadow01);
+
+  width: min(60vmin, 600px);
+  aspect-ratio: 1;
+}
+
+.row {
+  display: flex;
+  flex: 1;
+}
+
+.cell {
+  cursor: pointer;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+  font-weight: 600;
+  font-size: 1rem;
+
+  border: 1.5px solid var(--border-cell-color);
+  transition: scale 0.2s ease-in-out;
+}
+
+.cell:active {
+  transform: scale(1.08);
+  background-color: var(--primary-light-color);
+  color: black;
+}
+
+
+@media (425px < width <= 768px) {
+  html {
+    font-size: 20px;
+  }
+}
+@media (425px >= width) {
+  html {
+    font-size: 16px;
+  }
+}
