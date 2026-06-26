@@ -5,6 +5,19 @@ const cellEls = [...document.querySelectorAll('.cell')];
 
 /*-------------------------------- Constants --------------------------------*/
 const boardCells = []; // Store cell Elements in 2D
+const puzzle = [
+    [7, 3, '',  9, 5, '',  '','',''],
+    [2, 1, '',  6, 7, '',  5, 8, ''],
+    ['','', 5,  3, 1, '',  4,'','',],
+    
+    [1, 9, '',  '', 6, 3,  2,'','',],
+    [3, 4,  2,   1,'','',  6,'','',],
+    [5, 6,  8,   2, '',7,  '','',''],
+
+    ['', 2,'',  '',8, 1,   3,'',''],
+    ['','', 1,  '','', 9,  7, 6, 2],
+    ['', 7, '',  5, 2,'',  8, 1, 9]
+]
 
 /*---------------------------- Variables (state) ----------------------------*/
 
@@ -19,6 +32,7 @@ initializeGame();
 function initializeGame(){
     fetchCells()
     addBoardBorders();
+    loadPuzzle();
 }
 
 
@@ -47,4 +61,20 @@ function  addBoardBorders(){
         }
     });
     });
+}
+
+function loadPuzzle(){
+    puzzle.forEach((row, rowIndex)=>{
+        row.forEach((cell, colIndex)=>{
+            if(cell){
+                boardCells[rowIndex][colIndex].textContent = cell;
+                toggleCellClass(boardCells[rowIndex][colIndex], 'fixed');
+            }
+        })
+    })
+}
+
+/*------------------------------ Helper Functions ---------------------------*/
+function toggleCellClass(cell, className){
+    cell.classList.toggle(className);
 }

@@ -1,7 +1,7 @@
+/*-------------------------------- Imports ----------------------------------*/
 @import url("https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Londrina+Shadow&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap");
-html {
-  font-size: 22px;
-}
+
+/*-------------------------------- Root Variables ---------------------------*/
 :root {
   --primary-color: rgb(164, 109, 206);
   --primary-light-color: rgb(196, 188, 255);
@@ -32,6 +32,11 @@ html {
   --box-shadow02: 0px 0px 10px 1.5px var(--primary-active-color);
   --box-shadow03:  0px 0px 10px var(--error-color);
 }
+/*-------------------------------- Global Styles ----------------------------*/
+html {
+  font-size: 22px;
+}
+
 body {
   margin: 0;
   display: flex;
@@ -42,6 +47,8 @@ body {
   background-color: var(--background-color);
   font-family: "Nunito", sans-serif, serif, system-ui, "Helvetica Neue";
 }
+
+/*-------------------------------- Layout -----------------------------------*/
 header {
   display: flex;
   gap: 15px;
@@ -58,6 +65,7 @@ main {
   box-shadow: var(--box-shadow01);
 }
 
+/*-------------------------------- Board ------------------------------------*/
 #board {
   display: flex;
   flex-direction: column;
@@ -109,6 +117,12 @@ main {
   border-left-color: var(--border-color);
 }
 
+/*-------------------------------- State Styles -----------------------------*/
+.cell.fixed {
+  color: var(--text-primary-color);
+}
+
+/*-------------------------------- Responsive -------------------------------*/
 @media (425px < width <= 768px) {
   html {
     font-size: 20px;
