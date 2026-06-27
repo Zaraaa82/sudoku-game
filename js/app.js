@@ -256,3 +256,23 @@ inputPanelEl.addEventListener('click',(event)=>{
         handleNumberSelection(Number(event.target.textContent));
     }
 })
+
+document.addEventListener('keydown', (event)=>{
+    
+    let key = event.key;
+    let number = Number(key);
+    if(number >= 1 &&  number <= 9){
+        handleNumberSelection(number);
+    }
+    else if(key === 'Backspace'){
+        eraseNumber();
+    }else if(key === 'ArrowUp' && selectedRow > 0){
+        setSelectedCell(boardCells[selectedRow - 1][selectedCol]);
+    }else if(key === 'ArrowDown' && selectedRow < 8){
+        setSelectedCell(boardCells[selectedRow + 1][selectedCol]);
+    }else if(key === 'ArrowLeft' && selectedCol > 0){
+        setSelectedCell(boardCells[selectedRow][selectedCol - 1]);
+    }else if(key === 'ArrowRight' && selectedCol < 8){
+        setSelectedCell(boardCells[selectedRow][selectedCol + 1]);
+    }
+})
