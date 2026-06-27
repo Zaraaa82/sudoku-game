@@ -13,13 +13,14 @@
   --card-color: rgb(255, 255, 255);
   --border-color: rgb(181, 175, 201);
   --border-cell-color: rgba(198, 191, 219, 0.666);
+  --filling-color:rgb(133, 15, 224);
 
   /* State */
   --success-color: rgb(179, 228, 201);
   --success-light-color: rgb(224, 246, 235);
-  --error-color: rgb(255, 141, 141);
+  --error-color: rgb(249, 40, 40);
   --error-light-color: rgb(249, 207, 217);
-  --row-col-color: rgba(245, 239, 255, 0.934);
+  --row-col-color: rgba(238, 231, 250, 0.934);
   --same-Number-color: #d6c5eb;
 
   /* Text */
@@ -30,11 +31,12 @@
   /* Box shadow */
   --box-shadow01: 0px 2px 8px rgba(155, 155, 155, 0.2);
   --box-shadow02: 0px 0px 10px 1.5px var(--primary-active-color);
-  --box-shadow03:  0px 0px 10px var(--error-color);
+  --box-shadow03: 0px 0 8px var(--primary-active-color);
+  --box-shadow04: 0px 0px 10px var(--error-color);
 }
 /*-------------------------------- Global Styles ----------------------------*/
 html {
-  font-size: 22px;
+  font-size: 24px;
 }
 
 body {
@@ -42,10 +44,14 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   height: 100vh;
 
   background-color: var(--background-color);
   font-family: "Nunito", sans-serif, serif, system-ui, "Helvetica Neue";
+}
+h1 {
+  font-size: 24px;
 }
 
 /*-------------------------------- Layout -----------------------------------*/
@@ -55,8 +61,8 @@ header {
 }
 
 main {
-  height: 75vh;
-  width: 80vw;
+  height: 80%;
+  width: 80%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -72,7 +78,7 @@ main {
 
   background-color: var(--card-color);
   box-shadow: var(--box-shadow01);
-
+  flex-shrink: 1;
   width: min(60vmin, 600px);
   aspect-ratio: 1;
 }
@@ -92,6 +98,7 @@ main {
   text-align: center;
   font-weight: 600;
   font-size: 1rem;
+  color: var(--filling-color);
 
   border: 1.5px solid var(--border-cell-color);
   transition: scale 0.2s ease-in-out;
@@ -100,7 +107,6 @@ main {
 .cell:active {
   transform: scale(1.08);
   background-color: var(--primary-light-color);
-  color: black;
 }
 
 .cell.top-border {
@@ -135,23 +141,87 @@ main {
 .same-Number-color {
   background-color: var(--same-Number-color);
 }
-.cell.wrongNumber {
+/* .cell.wrongNumber {
   background-color: var(--error-light-color);
   border-color: var(--error-color);
   color: var(--error-color);
   box-shadow: var(--box-shadow03);
   border-radius: 1px;
+} */
+.wrongNumber{
+  color: var(--error-color);
+}
+.conflicting-number{
+  color: var(--error-color);
+  background-color: var(--error-light-color);
+}
+.conflicting-number.fixed{
+  color: var(--text-primary-color);
 }
 
 .filled {
-  color: var(--primary-color);
+  color: var(--filling-color);
 }
-
+/*-------------------------------- Input Panel -----------------------------*/
+#game-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 90%;
+  max-width: 700px;
+  margin: 10px 0px;
+}
+#game-status {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+#board-controls-container{
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+#game-controls{
+    background-color: rgb(249, 245, 255);
+    width: 200px;
+    flex-shrink: 1;
+}
+#input-panel {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  gap: 30px;
+}
+.number-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--box-shadow01);
+  background-color: var(--card-color);
+  border-radius: 5px;
+  text-align: center;
+  aspect-ratio: 1;
+  transition: all 0.3 ease-in-out;
+  cursor: pointer;
+}
+.number-btn:active{
+    color: rgb(119, 56, 168);
+    text-shadow: var(--box-shadow03);
+    box-shadow: var(--box-shadow03);
+    transform: translateY(-4px);
+}
 
 /*-------------------------------- Responsive -------------------------------*/
 @media (425px < width <= 768px) {
   html {
     font-size: 20px;
+  }
+}
+@media (656px >= width) {
+  #board-controls-container {
+    flex-direction: column;
   }
 }
 @media (425px >= width) {
