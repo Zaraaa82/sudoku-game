@@ -23,7 +23,14 @@
 
             <div id="game-status">
                 <div>Level</div>
-                <div>mistakes</div>
+                <div id="mistakes-control">
+                         <div>Mistakes</div>
+                         <div>
+                              <img class="heart" src="./assets/images/Remaining-chance.png" alt="Remaining chance">
+                              <img class="heart" src="./assets/images/Remaining-chance.png" alt="Remaining chance">
+                              <img class="heart" src="./assets/images/Remaining-chance.png" alt="Remaining chance">
+                         </div>
+                </div>
                 <div>timer</div>
                 <button>||</button>
             </div>
@@ -147,9 +154,12 @@
                     <div id="9" class="number-btn">9</div>                
                  </div>
         </div>
-
-
-
+        <div id="popup-backdrop" class="hidden">
+          <div id="popup">
+               <h4 id="popup-header">Message</h4>
+               <p id="popup-message">Messgae</p>
+               <button id="popup-btn">Click me</button>
+          </div>
     </main>
     
 </body>

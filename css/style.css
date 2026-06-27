@@ -14,6 +14,7 @@
   --border-color: rgb(181, 175, 201);
   --border-cell-color: rgba(198, 191, 219, 0.666);
   --filling-color:rgb(133, 15, 224);
+  --btn-color: rgb(241, 97, 146);
 
   /* State */
   --success-color: rgb(179, 228, 201);
@@ -61,8 +62,9 @@ header {
 }
 
 main {
-  height: 80%;
-  width: 80%;
+  /* height: 80%;
+  width: 80%; */
+  padding: 30px 50px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -141,13 +143,7 @@ main {
 .same-Number-color {
   background-color: var(--same-Number-color);
 }
-/* .cell.wrongNumber {
-  background-color: var(--error-light-color);
-  border-color: var(--error-color);
-  color: var(--error-color);
-  box-shadow: var(--box-shadow03);
-  border-radius: 1px;
-} */
+
 .wrongNumber{
   color: var(--error-color);
 }
@@ -212,6 +208,106 @@ main {
     box-shadow: var(--box-shadow03);
     transform: translateY(-4px);
 }
+/* Mistakes Control */
+#mistakes-control, #mistakes-control div{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#mistakes-control{
+  gap: 10px;
+}
+
+#heart-row{
+  
+}
+.heart{
+  height: 24px;
+}
+#pop-up{
+  height: 100px;
+  width: 100px;
+  background-color: rgb(24, 64, 100);
+  position: fixed;
+  z-index: 1;
+}
+#popup-overlay {
+    position: fixed;
+    inset: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+
+    z-index: 1000;
+}
+#popup{
+  background-color: var(--background-color);
+  padding: 2rem;
+  border-radius: 10px;
+  min-width: none;
+}
+
+#popup-backdrop {
+  position: fixed;
+  inset: 0;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  background: rgba(76, 76, 76, 0.3);
+  backdrop-filter: blur(2px);
+  
+  z-index: 1000;
+  transition: all 0.3 ease-in-out;
+}
+#popup {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: var(--card-color);
+  padding: 2rem;
+  border-radius: 12px;
+  width: 30vw;
+  min-width: 220px;
+  text-align: center;
+}
+#popup *{
+  margin: 5px 0;
+  color:var(--text-primary-color)
+}
+
+#popup-message{
+  font-size: 16px;
+}
+.hidden#popup-backdrop {
+  display: none;
+}
+
+#popup-btn{
+  border-radius: 30px;
+  padding: 10px 20px;
+  font-size: 18px;
+  margin-top: 15px;
+  color: white;
+  background-color: var(--btn-color);
+  border: none;
+  transform: all 0.2 ease-in-out;
+  cursor: pointer;
+}
+#popup-btn:hover{
+  filter: brightness(0.95);
+}
+#popup-btn:active{
+  transform: scale(0.97);
+  filter: brightness(0.9);
+}
+
 
 /*-------------------------------- Responsive -------------------------------*/
 @media (425px < width <= 768px) {
@@ -223,9 +319,19 @@ main {
   #board-controls-container {
     flex-direction: column;
   }
+  #popup-header{
+    font-size: 24px;
+  }
+
+  #popup-message{
+  font-size: 14px;
+  }
 }
 @media (425px >= width) {
   html {
     font-size: 16px;
+  }
+  #popup-header{
+  font-size: 20px;
   }
 }

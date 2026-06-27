@@ -5,6 +5,9 @@ const cellEls = [...document.querySelectorAll('.cell')];
 
 const inputPanelEl = document.querySelector('#input-panel');
 const numberBtnEls = [...document.querySelectorAll(".number-btn")];
+const heartEls = [...document.querySelectorAll('.heart')];
+const popupbackdropEl = document.querySelector('#popup-backdrop');
+const [popupHeaderEl,popupMessageEl, popupBtnEl] = [...document.querySelectorAll('#popup *')];
 
 /*-------------------------------- Constants --------------------------------*/
 const boardCells = []; // Store cell Elements in 2D
@@ -47,6 +50,9 @@ let colCells = [];
 let boxCells = [];
 let relatedCells = [];
 let selectedSameNumber = [];
+
+let mistakesCounter = 0;
+
 
 /*-------------------------------- Functions --------------------------------*/
 
@@ -210,6 +216,7 @@ function handleNumberSelection(number){
         if (!isValidNumber(number)) {
             updateClassList(selectedCell, 'add', 'wrongNumber');
             updateClassList(selectedCell, 'remove', 'filled');
+            handleMistake();
 
         } 
         else {
@@ -231,6 +238,62 @@ function eraseNumber(){
     }
 }
 
+function handleMistake(){
+    mistakesCounter++;
+    let heart = heartEls[heartEls.length - mistakesCounter];
+    heart.src = './assets/images/Lost-chance.png';
+    heart.alt = 'Remaining chance';
+    if(mistakesCounter === heartEls.length){
+        displayPopup('Game Over')
+    }
+}
+function displayPopup(displayType){
+    if(displayType == 'Game Over'){
+        popupHeaderEl.textContent = 'Game Over';
+        popupMessageEl.innerHTML = 'You\'ve reached the maximum number of mistakes.<br><br>Try again with a new puzzle!'
+        popupBtnEl.textContent = 'New Game';
+        updateClassList(popupBtnEl, 'add', 'mistakes');
+        updateClassList(popupbackdropEl, 'remove', 'hidden');
+    }
+}
+// managePopu(true, 'mistakes');
+function handlePopupBtnClick(){
+    if(popupBtnEl.classList.contains('mistakes')){
+        updateClassList(popupBtnEl, 'remove', 'mistakes');
+        updateClassList(popupbackdropEl, 'add', 'hidden');
+        startNewGame();
+    }
+}
+function startNewGame(){
+    clearBoard();
+    clearSelected();
+    initializeGame();
+}
+function clearBoard(){
+    cellEls.forEach(cell=>{
+        cell.textContent = '';
+        cell.classList = 'cell';
+    });
+    heartEls.forEach(heart => {
+        heart.src = './assets/images/Remaining-chance.png';
+        heart.alt = 'Lost Chance';
+    });
+    mistakesCounter = 0;
+    clearSelected();
+
+}
+function clearSelected(){
+    selectedCell = null;
+    selectedRow = -1;
+    selectedCol = -1;
+    cellValue = null;
+
+    rowCells = [];
+    colCells = [];
+    boxCells = [];
+    relatedCells = [];
+    selectedSameNumber = [];
+}
 
  
 /*---------------------------- Validation ----------------------------------*/
@@ -287,3 +350,5 @@ document.addEventListener('keyup', (event)=>{
         updateClassList(pressedBtn, 'remove', 'pressed-number-btn');
      }
 })
+
+popupBtnEl.addEventListener('click', handlePopupBtnClick);
