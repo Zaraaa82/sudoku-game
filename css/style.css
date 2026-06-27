@@ -231,25 +231,6 @@ main {
   position: fixed;
   z-index: 1;
 }
-#popup-overlay {
-    position: fixed;
-    inset: 0;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(5px);
-
-    z-index: 1000;
-}
-#popup{
-  background-color: var(--background-color);
-  padding: 2rem;
-  border-radius: 10px;
-  min-width: none;
-}
 
 #popup-backdrop {
   position: fixed;
@@ -263,14 +244,17 @@ main {
   backdrop-filter: blur(2px);
   
   z-index: 1000;
-  transition: all 0.3 ease-in-out;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+
 }
 #popup {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: var(--card-color);
+  background-color: white;
+  border-radius: 10px;
   padding: 2rem;
   border-radius: 12px;
   width: 30vw;
@@ -286,7 +270,8 @@ main {
   font-size: 16px;
 }
 .hidden#popup-backdrop {
-  display: none;
+  opacity: 0;
+  pointer-events: none;
 }
 
 #popup-btn{
@@ -296,7 +281,7 @@ main {
   margin-top: 15px;
   color: white;
   background-color: var(--btn-color);
-  border: none;
+  border: var(--btn-color) 2px solid;
   transform: all 0.2 ease-in-out;
   cursor: pointer;
 }

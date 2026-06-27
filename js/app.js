@@ -259,9 +259,11 @@ function displayPopup(displayType){
 // managePopu(true, 'mistakes');
 function handlePopupBtnClick(){
     if(popupBtnEl.classList.contains('mistakes')){
-        updateClassList(popupBtnEl, 'remove', 'mistakes');
-        updateClassList(popupbackdropEl, 'add', 'hidden');
-        startNewGame();
+        setTimeout(()=>{
+            updateClassList(popupBtnEl, 'remove', 'mistakes');
+            updateClassList(popupbackdropEl, 'add', 'hidden');
+            startNewGame();
+        },100)
     }
 }
 function startNewGame(){
