@@ -4,6 +4,7 @@ const rowEls = document.querySelectorAll(".row");
 const cellEls = [...document.querySelectorAll('.cell')];
 
 const inputPanelEl = document.querySelector('#input-panel');
+const numberBtnEls = [...document.querySelectorAll(".number-btn")];
 
 /*-------------------------------- Constants --------------------------------*/
 const boardCells = []; // Store cell Elements in 2D
@@ -263,6 +264,8 @@ document.addEventListener('keydown', (event)=>{
     let number = Number(key);
     if(number >= 1 &&  number <= 9){
         handleNumberSelection(number);
+        const pressedBtn = numberBtnEls.find(btn => Number(btn.textContent) == number);
+        updateClassList(pressedBtn, 'add', 'pressed-number-btn');
     }
     else if(key === 'Backspace'){
         eraseNumber();
@@ -275,4 +278,12 @@ document.addEventListener('keydown', (event)=>{
     }else if(key === 'ArrowRight' && selectedCol < 8){
         setSelectedCell(boardCells[selectedRow][selectedCol + 1]);
     }
+})
+document.addEventListener('keyup', (event)=>{
+    let key = event.key;
+    let number = Number(key);
+     if(number >= 1 &&  number <= 9){
+        const pressedBtn = numberBtnEls.find(btn => Number(btn.textContent) == number);
+        updateClassList(pressedBtn, 'remove', 'pressed-number-btn');
+     }
 })
