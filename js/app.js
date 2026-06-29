@@ -16,7 +16,7 @@ const [timeEl, timerBtnEl] = [...document.querySelectorAll('#timer-control *')]
 
 // Popup Elements
 const popupbackdropEl = document.querySelector('#popup-backdrop');
-const [popupHeaderEl,popupstatusEl,popupMessageEl, popupPrimaryBtnEl, popupSecondaryBtnEl] = [...document.querySelectorAll('#popup .pop-element')];
+const [popupImgEl,popupHeaderEl,popupstatusEl,popupMessageEl, popupPrimaryBtnEl, popupSecondaryBtnEl] = [...document.querySelectorAll('#popup .pop-element')];
 const popupDifficultyEl = document.querySelector('#popup-difficulty');
 const popupheartsEls = [...document.querySelectorAll('#popup-mistakes .heart')];
 const popupTimeEl = document.querySelector('#popup-time');
@@ -72,6 +72,18 @@ let time = {
     minutes: 0
 }
 
+let correctCellTracker = {
+    '1':0,
+    '2':0,
+    '3':0,
+    '4':0,
+    '5':0,
+    '6':0,
+    '7':0,
+    '8':0,
+    '9':0,
+}
+
 /*-------------------------------- Functions --------------------------------*/
 
 
@@ -118,6 +130,7 @@ function loadPuzzle(){
         row.forEach((cell, colIndex)=>{
             if(cell){
                 boardCells[rowIndex][colIndex].textContent = cell;
+                correctCellTracker[cell]++;
                 updateClassList(boardCells[rowIndex][colIndex],'add', 'fixed');
             }
         })
@@ -154,9 +167,8 @@ function startTimer(){
             time.minutes++;
         }
         if(time.minutes === 60){
-            displayPopup('Exceeded Time');
-            clearInterval(timer);
-            
+            stopTimer();
+            displayPopup('Timeout');
         }
         timeEl.textContent = formatTimer();
     },1000);
@@ -291,7 +303,12 @@ function startNewGame(){
     clearBoard();
     initializeGame();
 }
+function restartGame(){
 
+}
+function closeGame(){
+    clearBoard();
+}
 function handleNumberSelection(number){
 
     if(selectedCell.classList.contains('fixed')){
@@ -309,13 +326,14 @@ function handleNumberSelection(number){
             handleMistake();
         } 
         else {
-
+            correctCellTracker[number]++;
             updateClassList(selectedCell, 'remove', 'wrongNumber');
             updateClassList(selectedCell, 'add', 'filled');
         }
         setSelectedCell(selectedCell);
     }
-    console.log(detectWin());
+    detectNumberCompletion(number);
+    detectWin();
     
 }
 
@@ -323,6 +341,9 @@ function handleNumberSelection(number){
 function eraseNumber(){
     // Prevent erasing a fixed cell
     if(!selectedCell.classList.contains('fixed')){
+        if(isValidNumber(cellValue)){
+            correctCellTracker[cellValue]--;
+        }
         selectedCell.textContent = '';
         updateClassList(selectedCell, 'remove','wrongNumber','filled');
         setSelectedCell(selectedCell);
@@ -338,7 +359,11 @@ function clearBoard(){
         heart.src = './assets/images/Remaining-chance.png';
         heart.alt = 'Lost Chance';
     });
+    currentDifficulty = null; 
     mistakesCounter = 0;
+    for(let key in correctCellTracker){
+        correctCellTracker[key] = 0;
+    }
     clearSelected();
     clearTimer();
 
@@ -355,37 +380,110 @@ function clearSelected(){
     relatedCells = [];
     selectedSameNumber = [];
 }
-
+function detectNumberCompletion(number){
+    if(correctCellTracker[number] === 9){
+        updateClassList(numberBtnEls[number-1], 'add', 'hidden');
+    }else{
+        updateClassList(numberBtnEls[number-1], 'remove', 'hidden');
+    }
+}
+function detectWin(){
+    let isWin = Object.values(correctCellTracker).every(value=> value==9);
+    if(isWin){
+        stopTimer();
+        displayPopup('win');
+    }
+}
 
 /*------------------------- Popup Management ----------------------------*/
 
 function displayPopup(displayType){
     switch(displayType){
         case 'Game Over':
-            popupHeaderEl.textContent = 'Game Over';
-            popupMessageEl.innerHTML = 'You\'ve reached the maximum number of mistakes.<br>Try again with a new puzzle!'
-            popupPrimaryBtnEl.textContent = 'New Game';
-            popupPrimaryBtnEl.dataset.status = 'mistakes';
-            
-            updateClassList(popupstatusEl, 'add', 'block');
-            updateClassList(popupbackdropEl, 'remove', 'hidden');
+            updatePopupContent(
+                'lose',
+                'Game Over',
+                'You\'ve reached the maximum number of mistakes.<br>Try again with a new puzzle!',
+                false,
+                'New Game',
+                'mistakes',
+                ''
+            );
         break;
 
         case 'Pause Timer':
-            updatePopupStatus();
-            popupHeaderEl.textContent = 'Pause Game';
-
-            popupMessageEl.innerHTML = 'Need a moment? Your game is waiting for you.';
-            updateClassList(popupstatusEl, 'remove', 'hidden');
-            popupPrimaryBtnEl.textContent = 'Resume Game';
-            popupPrimaryBtnEl.dataset.status = 'unpause';
-            updateClassList(popupbackdropEl, 'remove', 'hidden');
-            
-
+            updatePopupContent(
+                'Pause icon',
+                'Pause Game',
+                'Need a moment? Your game is waiting for you.',
+                true,
+                'Resume',
+                'unpause',
+                ''
+            );        
         break;
-        
+        case 'win':
+            updatePopupContent(
+                'winning-cup',
+                'Congratulations!',
+                'You solved the puzzle Successfully! <br> Ready for <span id="another-game">another game?</span> ',
+                true,
+                'New Game',
+                'win',
+                'Close'
+            ); 
+        break;
+        case 'Timeout':
+            updatePopupContent(
+                'Timeout icon',
+                'Time\'s UP!',
+                'Better lock next time! <br> Try Solving The puzzle before timer expires',
+                false,
+                'Try Again',
+                'timeout',
+                'New Game'
+            );
+        break;        
     }
-    
+    updateClassList(popupbackdropEl, 'remove', 'hidden');    
+}
+
+function closePopup(callback){
+    setTimeout(() => {
+        updateClassList(popupPrimaryBtnEl, 'remove', 'tab');
+        updateClassList(popupbackdropEl, 'add', 'hidden');
+        startNewGame();
+    }, 50);
+    setTimeout(()=>{
+        updateClassList(popupstatusEl, 'add', 'block');
+    },300)
+
+    if (callback) 
+        callback();
+}
+
+function updatePopupContent(img,header, message, gameStatus, primaryBtn, primaryBtnstatus, secondaryBtn){
+    updatePopupStatus();
+    popupImgEl.src = './assets/images/' + img +'.png';
+    popupImgEl.alt = img; 
+    popupHeaderEl.textContent = header;
+    popupMessageEl.innerHTML = message;
+    popupPrimaryBtnEl.textContent = primaryBtn;
+    popupPrimaryBtnEl.dataset.status = primaryBtnstatus;
+    popupSecondaryBtnEl.dataset.status = secondaryBtn;
+    if(secondaryBtn === ''){
+        updateClassList(popupSecondaryBtnEl, 'add', 'block');
+    }else{
+        updateClassList(popupSecondaryBtnEl, 'remove', 'block');
+        popupSecondaryBtnEl.textContent = secondaryBtn;
+    }
+    if(gameStatus){
+        updateClassList(popupstatusEl, 'remove', 'block');
+    }else{
+        
+        updateClassList(popupstatusEl, 'add', 'block',);
+    }
+
 }
 function updatePopupStatus(){
     popupDifficultyEl.textContent = currentDifficulty;
@@ -401,37 +499,32 @@ function updatePopupStatus(){
 
 }
 function handlePopupPrimaryBtnClick(){
- 
+    updateClassList(popupPrimaryBtnEl, 'add', 'tab');
     switch(popupPrimaryBtnEl.dataset.status){
         case 'mistakes':
-            updateClassList(popupPrimaryBtnEl, 'add', 'tab');
-        
-            setTimeout(() => {
-                updateClassList(popupPrimaryBtnEl, 'remove', 'tab');
-                updateClassList(popupbackdropEl, 'add', 'hidden');
-                startNewGame();
-            }, 50);
-            setTimeout(()=>{
-                updateClassList(popupstatusEl, 'remove', 'block');
-            },300)
-                
+            closePopup(startNewGame);               
         break;
-        case 'unpause':
-            updateClassList(popupPrimaryBtnEl, 'add', 'tab');
-        
-            setTimeout(() => {
-                updateClassList(popupbackdropEl, 'add', 'hidden');
-                updateClassList(popupPrimaryBtnEl, 'remove', 'tab');
-                updateClassList(popupstatusEl, 'add', 'hidden');
-                resumeTimer();
-            }, 50);
-          
+        case 'unpause': 
+            closePopup(resumeTimer)
+        break;
+        case 'win':
+            closePopup(startNewGame);
+        break;
+        case 'timeout':
+            restartGame();
         break;   
-    }
-
-       
+    }       
 }
+
 function handlePopupSecondaryBtnClick(){
+    switch(popupSecondaryBtnEl.dataset.status){
+        case 'New Game':
+            closePopup(startNewGame);
+        break;
+        case 'Close':
+            closePopup(closeGame);
+        break;
+    }
 
 }
 
@@ -450,7 +543,7 @@ function isValidNumber(number){
 
 // Adds, removes, or toggles one or more CSS classes on an element
 function updateClassList(element, action, ...className){
-    element.classList[action](className);
+    element.classList[action](...className);
 }
 
 

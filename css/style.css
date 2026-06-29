@@ -45,6 +45,7 @@
 /*-------------------------------- Global Styles ----------------------------*/
 * {
   -webkit-tap-highlight-color: transparent;
+  transition: all 0.2s ease-in-out;
 }
 html {
   font-size: 24px;
@@ -247,7 +248,7 @@ p.control-label{
 .number-btn {
   flex:1;
   width: 100%;
-
+  opacity: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -300,6 +301,12 @@ p.control-label{
   margin: 5px 0;
 }
 #popup-header{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+#popup-header-message{
   font-size: 1rem;
   color:var(--text-primary-color)
 }
@@ -309,7 +316,7 @@ p.control-label{
   color: var(--text-secondary-color);
   font-style: italic;
 }
-.hidden#popup-backdrop, .hidden#popup-status{
+.hidden#popup-backdrop, .hidden#popup-status, .hidden{
   opacity: 0;
   pointer-events: none;
 }
@@ -376,7 +383,14 @@ p.control-label{
   display: none;
 }
 #popup-status .control-container:not(:last-child) {
-    border-right: 2px solid var(--status-border-color);
+  border-right: 2px solid var(--status-border-color);
+}
+#popup-img{
+  height: 2rem;
+}
+#another-game{
+  color: var(--primary-color);
+  font-weight: bolder;
 }
 
 
@@ -392,7 +406,7 @@ p.control-label{
     align-content: space-between;
     align-items: center;
   }
-  #popup-header{
+  #popup-header-message{
     font-size: 24px;
   }
   #game-controls{
@@ -407,7 +421,7 @@ p.control-label{
   html {
     font-size: 16px;
   }
-  #popup-header{
+  #popup-header-message{
   font-size: 20px;
   }
 }
