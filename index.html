@@ -22,17 +22,25 @@
         <div id="game-panel">
 
             <div id="game-status">
-                <div>Level</div>
-                <div id="mistakes-control">
-                         <div>Mistakes</div>
-                         <div>
-                              <img class="heart" src="./assets/images/Remaining-chance.png" alt="Remaining chance">
-                              <img class="heart" src="./assets/images/Remaining-chance.png" alt="Remaining chance">
-                              <img class="heart" src="./assets/images/Remaining-chance.png" alt="Remaining chance">
-                         </div>
-                </div>
-                <div>timer</div>
-                <button>||</button>
+               <div class="control-container">
+                    <p class="control-label">Level</p>
+                    <div>Easy</div>
+               </div>
+               <div id="mistakes-control" class="control-container">
+                    <p class="control-label">Mistakes</p>
+                    <div>
+                         <img class="heart chance" src="./assets/images/Remaining-chance.png" alt="Remaining chance">
+                         <img class="heart chance" src="./assets/images/Remaining-chance.png" alt="Remaining chance">
+                         <img class="heart chance" src="./assets/images/Remaining-chance.png" alt="Remaining chance">
+                    </div>
+               </div>
+               <div  class="control-container">
+                    <p class="control-label">Time</p>
+                    <div id="timer-control">
+                         <p>00:00</p>
+                         <img id="timer-btn" src="./assets/images/pause.png" alt="Pause button" data-status="playing">
+                    </div>
+               </div>
             </div>
             <div id="board-controls-container">
     
@@ -156,9 +164,31 @@
         </div>
         <div id="popup-backdrop" class="hidden">
           <div id="popup">
-               <h4 id="popup-header">Message</h4>
-               <p id="popup-message">Messgae</p>
-               <button id="popup-btn">Click me</button>
+               <h4 id="popup-header" class="pop-element">Message</h4>
+               
+               <div id="popup-status" class="hidden pop-element">
+                    <div class="control-container">
+                         <p class="control-label">Difficulty</p>
+                         <div id="popup-difficulty">Easy</div>
+                    </div>
+                    <div class="control-container">
+                         <p class="control-label">Mistakes</p>
+                         <div id="popup-mistakes">
+                              <img class="heart" src="./assets/images/Remaining-chance.png" alt="Remaining chance">
+                              <img class="heart" src="./assets/images/Remaining-chance.png" alt="Remaining chance">
+                              <img class="heart" src="./assets/images/Remaining-chance.png" alt="Remaining chance">
+                         </div>
+                    </div>
+                    <div  class="control-container ">
+                         <p class="control-label">Time</p>
+                         <div id="popup-time">00:00</div>
+                    </div>
+               </div>
+               <div id="popup-message" class="pop-element">Messgae</div>
+               <div id="popup-btns-container">
+                    <button id="popup-primary-btn"class="pop-element popup-btn">Primary</button>
+                    <button id="popup-secondary-btn" class="pop-element popup-btn block">Secondary</button>
+               </div>
           </div>
     </main>
     

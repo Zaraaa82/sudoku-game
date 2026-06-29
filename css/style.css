@@ -13,8 +13,15 @@
   --card-color: rgb(255, 255, 255);
   --border-color: rgb(181, 175, 201);
   --border-cell-color: rgba(198, 191, 219, 0.666);
+  --status-border-color: rgb(237, 238, 242);
   --filling-color:rgb(133, 15, 224);
-  --btn-color: rgb(241, 97, 146);
+  --btn-primary-color: rgb(241, 97, 146);
+  --btn-text-color: rgb(255, 255, 255);
+  --btn-secondary-background-color: transparent;
+  --btn-secondary-hover:rgba(241, 97, 145, 0.129);
+  --btn-secondary-active:rgba(241, 97, 145, 0.226);
+  --popup-background-color:rgb(255, 255, 255);
+
 
   /* State */
   --success-color: rgb(179, 228, 201);
@@ -26,7 +33,7 @@
 
   /* Text */
   --text-primary-color: rgb(50, 48, 70);
-  --text-secondary-color: rgb(142, 138, 163);
+  --text-secondary-color: #586878;
   --text-Inverse-color: rgb(255, 255, 255);
 
   /* Box shadow */
@@ -36,6 +43,9 @@
   --box-shadow04: 0px 0px 10px var(--error-color);
 }
 /*-------------------------------- Global Styles ----------------------------*/
+* {
+  -webkit-tap-highlight-color: transparent;
+}
 html {
   font-size: 24px;
 }
@@ -54,6 +64,11 @@ body {
 h1 {
   font-size: 24px;
 }
+button{
+  all: unset;
+  font-family: "Nunito", sans-serif, serif, system-ui, "Helvetica Neue";
+  font-weight: 700;
+}
 
 /*-------------------------------- Layout -----------------------------------*/
 header {
@@ -71,6 +86,15 @@ main {
   background-color: var(--card-color);
   border-radius: 15px;
   box-shadow: var(--box-shadow01);
+}
+#game-panel {
+  display: flex;
+  flex-direction: column;
+  align-content: space-between;
+  gap: 20px;
+  width: 90%;
+  max-width: 700px;
+  margin: 10px 0px;
 }
 
 /*-------------------------------- Board ------------------------------------*/
@@ -125,7 +149,7 @@ main {
   border-left-color: var(--border-color);
 }
 
-/*-------------------------------- State Styles -----------------------------*/
+/*-------------------------------- Cell State -----------------------------*/
 .cell.fixed {
   color: var(--text-primary-color);
 }
@@ -158,20 +182,13 @@ main {
 .filled {
   color: var(--filling-color);
 }
-/*-------------------------------- Input Panel -----------------------------*/
-#game-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 90%;
-  max-width: 700px;
-  margin: 10px 0px;
-}
-#game-status {
+/*-------------------------------- Game status -----------------------------*/
+
+#game-status{
   display: flex;
   justify-content: space-between;
-  width: 100%;
   align-items: center;
+  width: 100%;
 }
 #board-controls-container{
     display: flex;
@@ -183,14 +200,54 @@ main {
     width: 200px;
     flex-shrink: 1;
 }
+
+.control-container{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.control-container div{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap:10px;
+  height: 18px;
+}
+
+.control-container p, .control-container div{
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary-color);
+  font-weight: 500;
+}
+
+p.control-label{
+  font-weight: 700;
+}
+
+.heart, #timer-btn{
+  height: 20px;
+}
+
+#timer-btn{
+  cursor: pointer;
+}
+
+/*-------------------------------- Input Panel -----------------------------*/
 #input-panel {
   display: flex;
   width: 100%;
   justify-content: space-between;
-  gap: 30px;
+  gap: 20px;
+  
 }
 .number-btn {
-  flex: 1;
+  flex:1;
+  width: 100%;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -208,30 +265,8 @@ main {
     box-shadow: var(--box-shadow03);
     transform: translateY(-4px);
 }
-/* Mistakes Control */
-#mistakes-control, #mistakes-control div{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-#mistakes-control{
-  gap: 10px;
-}
 
-#heart-row{
-  
-}
-.heart{
-  height: 24px;
-}
-#pop-up{
-  height: 100px;
-  width: 100px;
-  background-color: rgb(24, 64, 100);
-  position: fixed;
-  z-index: 1;
-}
-
+/*-------------------------------- Popup -----------------------------*/
 #popup-backdrop {
   position: fixed;
   inset: 0;
@@ -245,7 +280,7 @@ main {
   
   z-index: 1000;
   opacity: 1;
-  transition: opacity 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
 
 }
 #popup {
@@ -253,44 +288,95 @@ main {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: white;
-  border-radius: 10px;
+  gap: 1rem;
+  background-color: var(--popup-background-color);
   padding: 2rem;
   border-radius: 12px;
-  width: 30vw;
-  min-width: 220px;
+  width: 35vw;
+  min-width: 200px;
   text-align: center;
 }
 #popup *{
   margin: 5px 0;
+}
+#popup-header{
+  font-size: 1rem;
   color:var(--text-primary-color)
 }
 
 #popup-message{
-  font-size: 16px;
+  font-size: calc(3rem/4);
+  color: var(--text-secondary-color);
+  font-style: italic;
 }
-.hidden#popup-backdrop {
+.hidden#popup-backdrop, .hidden#popup-status{
   opacity: 0;
   pointer-events: none;
 }
-
-#popup-btn{
+#popup-btns-container{
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.popup-btn{
   border-radius: 30px;
   padding: 10px 20px;
-  font-size: 18px;
+  font-size: calc(3rem/4);
   margin-top: 15px;
-  color: white;
-  background-color: var(--btn-color);
-  border: var(--btn-color) 2px solid;
+  border: var(--btn-primary-color) 2px solid;
   transform: all 0.2 ease-in-out;
   cursor: pointer;
 }
-#popup-btn:hover{
+#popup-primary-btn{
+  color: var(--btn-text-color);
+  background-color: var(--btn-primary-color);
+}
+
+#popup-secondary-btn{
+  color: var(--btn-primary-color);
+  background-color: var(--btn-secondary-background-color);
+}
+#popup-secondary-btn:hover{
+  background-color: var(--btn-secondary-hover);
+}
+#popup-secondary-btn:active{
+  background-color: var(--secondary-btn-active);
+}
+
+#popup-primary-btn:hover{
   filter: brightness(0.95);
 }
-#popup-btn:active{
+.popup-btn:active, .popup-btn.tab{
   transform: scale(0.97);
   filter: brightness(0.9);
+}
+#popup-status{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  gap: 0;
+  opacity: 1;
+  transition: all 0.3s ease-in-out;
+}
+
+#popup-status .control-container {
+  flex: 1;
+  padding: 0 1.25rem;
+}
+#popup-status .control-container * {
+  font-size: 0.7em;
+}
+#popup-status .heart{
+  height: 16px;
+}
+.block#popup-status, .block{
+  display: none;
+}
+#popup-status .control-container:not(:last-child) {
+    border-right: 2px solid var(--status-border-color);
 }
 
 
@@ -303,9 +389,14 @@ main {
 @media (656px >= width) {
   #board-controls-container {
     flex-direction: column;
+    align-content: space-between;
+    align-items: center;
   }
   #popup-header{
     font-size: 24px;
+  }
+  #game-controls{
+    width: 100%;
   }
 
   #popup-message{
