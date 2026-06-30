@@ -8,11 +8,13 @@ const cellEls = [...document.querySelectorAll('.cell')];
 const inputPanelEl = document.querySelector('#input-panel');
 const numberBtnEls = [...document.querySelectorAll(".number-btn")];
 
-// Mistake Chances Elements
+// Status Elements
 const heartEls = [...document.querySelectorAll(' .heart.chance')];
-
-// Timer Elements
 const [timeEl, timerBtnEl] = [...document.querySelectorAll('#timer-control *')]
+
+// Controller Elements
+const eraseBtnEl = document.querySelector('#erase-btn');
+const notesBtnEl = document.querySelector('#notes-btn');
 
 // Popup Elements
 const popupbackdropEl = document.querySelector('#popup-backdrop');
@@ -23,6 +25,7 @@ const popupTimeEl = document.querySelector('#popup-time');
 
 /*-------------------------------- Constants --------------------------------*/
 const boardCells = []; // Store cell Elements in 2D
+const notes = [];
 const dummyPuzzle = [
     [7, 3, '',  9, 5, '',  '','',''],
     [2, 1, '',  6, 7, '',  5, 8, ''],
@@ -84,6 +87,8 @@ let correctCellTracker = {
     '9':0,
 }
 
+let isTakingNotes = false;
+
 /*-------------------------------- Functions --------------------------------*/
 
 
@@ -92,55 +97,72 @@ let correctCellTracker = {
 initializeGame();
 
 function initializeGame(){
-    fetchCells()
-    addBoardBorders();
-    loadPuzzle();
-    selectStartingCell();
-    startTimer();
+    fetchCells();
+    createNotes()
+    startNewGame();
 }
 /*------------------------------- Game Setup -------------------------------*/
 
 function fetchCells() {
-    boardCells.length = 0;
     for (let row = 0; row < 9; row++) {
         boardCells.push(cellEls.slice(row * 9, row * 9 + 9));
     }
 }
-
-function  addBoardBorders(){
-    boardCells.forEach((row, rowIndex) => {
-    row.forEach((cell, colIndex) => {
-        if (colIndex === 2 || colIndex === 5 || colIndex === 8) {
-            updateClassList(cell,'add', 'right-border');
-        } else if (colIndex === 0 || colIndex === 3 || colIndex === 6) {
-            updateClassList(cell,'add', 'left-border');
-        }
-
-        if (rowIndex === 2 || rowIndex === 5 || rowIndex === 8) {
-            updateClassList(cell, 'add', 'bottom-border');
-        }else if (rowIndex === 0 || rowIndex === 3 || rowIndex === 6) {
-            updateClassList(cell, 'add', 'top-border');
-        }
-    });
-    });
-}
-
-function loadPuzzle(){
-    dummyPuzzle.forEach((row, rowIndex)=>{
-        row.forEach((cell, colIndex)=>{
-            if(cell){
-                boardCells[rowIndex][colIndex].textContent = cell;
-                correctCellTracker[cell]++;
-                updateClassList(boardCells[rowIndex][colIndex],'add', 'fixed');
+function createNotes(){
+    for(let row=0 ; row<9 ; row++){
+        notes.push([]);
+        for(let col=0 ; col<9 ;col++){
+            notes[row].push([]);
+            let noteGrid = document.createElement('div');
+            noteGrid.classList.add('note-grid');
+            let gridObject = {grid: noteGrid, cells: []};
+            for(let i=1 ; i<=9 ; i++){
+                let noteEl = document.createElement('div');
+                noteEl.classList.add('note-cell');
+                noteEl.dataset.note = i;
+                gridObject.cells.push(noteEl);
+                noteGrid.append(noteEl);            
             }
-        })
-    })
+            notes[row][col]=gridObject;
+        }
+    }
 }
 
-function selectStartingCell(){
-    let firstSelect = cellEls.find(cell=> !cell.classList.contains('fixed'));
-    setSelectedCell(firstSelect);
+
+function startNewGame(){
+    clearBoard();
+    loadPuzzle();
+    selectStartingCell();
+    startTimer();
+    currentDifficulty = 'Easy'; // will ba changed
 }
+function restartGame(){
+
+}
+function closeGame(){
+    clearBoard();
+}
+
+
+// function  addBoardBorders(){
+//     boardCells.forEach((row, rowIndex) => {
+//     row.forEach((cell, colIndex) => {
+//         if (colIndex === 2 || colIndex === 5 || colIndex === 8) {
+//             updateClassList(cell,'add', 'right-border');
+//         } else if (colIndex === 0 || colIndex === 3 || colIndex === 6) {
+//             updateClassList(cell,'add', 'left-border');
+//         }
+
+//         if (rowIndex === 2 || rowIndex === 5 || rowIndex === 8) {
+//             updateClassList(cell, 'add', 'bottom-border');
+//         }else if (rowIndex === 0 || rowIndex === 3 || rowIndex === 6) {
+//             updateClassList(cell, 'add', 'top-border');
+//         }
+//     });
+//     });
+// }
+
+
 /*-------------------------- Game status Management ---------------------------*/
 // Difficulty level Management
 
@@ -218,13 +240,19 @@ function setSelectedCell(cell){
         updateSelectedCellHighlight('remove');
 
     selectedCell = cell;
-    cellValue = Number(selectedCell.textContent);
     [selectedRow,selectedCol] = selectedCell.id.split("-").map(num=>Number(num));
     rowCells = findRowCells(selectedRow, boardCells);
     colCells = findColCells(selectedCol, boardCells);
     boxCells = findBoxCells(selectedRow, selectedCol, boardCells);
     relatedCells = [...rowCells, ...colCells, ...boxCells];
-    findSameNumber(selectedCell.textContent);
+
+    if(!containsNotes(selectedCell)){
+        cellValue = Number(selectedCell.textContent);
+        findSameNumber(selectedCell.textContent);
+    }else{
+        cellValue = '';
+        findSameNumber('');
+    }
     
     updateSelectedCellHighlight('add');
 }
@@ -299,26 +327,29 @@ function findSameNumber(number){
 }
 
 /*--------------------------- Game Actions ---------------------------------*/
-function startNewGame(){
-    clearBoard();
-    initializeGame();
-}
-function restartGame(){
 
-}
-function closeGame(){
-    clearBoard();
-}
 function handleNumberSelection(number){
 
     if(selectedCell.classList.contains('fixed')){
         // shake animation or give a message
         return;
     }
-    if(number === cellValue){
-        eraseNumber();
+    if(isTakingNotes){
+        handleNoteSelection(number);
     }else{
-        selectedCell.textContent = number;
+        handleValueSelection(number);
+    }    
+}
+function handleTakingNotes(){
+    isTakingNotes = !isTakingNotes;
+    notesBtnEl.classList.toggle('on');
+}
+
+function handleValueSelection(number){
+    if(number === cellValue){
+        eraseCell();
+    }else{
+        selectedCell.innerHTML = number;
 
         if (!isValidNumber(number)) {
             updateClassList(selectedCell, 'add', 'wrongNumber');
@@ -327,24 +358,66 @@ function handleNumberSelection(number){
         } 
         else {
             correctCellTracker[number]++;
+            updateRelatedNotes(number);
             updateClassList(selectedCell, 'remove', 'wrongNumber');
             updateClassList(selectedCell, 'add', 'filled');
         }
         setSelectedCell(selectedCell);
     }
+    clearCellNotes(selectedRow,selectedCol)
     detectNumberCompletion(number);
     detectWin();
-    
+}
+function handleNoteSelection(number){
+    let noteCell = getNotesCell(selectedRow, selectedCol, number)
+    // Update note cell value
+    if(noteCell.textContent){
+        noteCell.textContent = '';
+    }else{
+        noteCell.textContent = number;
+    }
+    // Render note grid
+    selectedCell.replaceChildren(getNotesGrid(selectedRow, selectedCol));
+}
+
+function updateRelatedNotes(number){
+    relatedCells.forEach(cell =>{
+        let [row,col] = [...cell.id.split('-').map(num=> Number(num))];
+        if(containsNotes(cell)){
+            updateNoteCell(row, col, number, '');
+        }
+    })
+}
+function clearCellNotes(row, col){
+    notes[row][col].cells.forEach(noteCell => noteCell.textContent = '');
+}
+
+function clearallNotes(){
+    notes.forEach((row,rowIndex)=> row.forEach((cell,colIndex)=>{
+        clearCellNotes(rowIndex, colIndex);
+    }));
+}
+function containsNotes(cell){
+    return cell.firstElementChild && cell.firstElementChild.classList.contains('note-grid')
+}
+function getNotesGrid(row, col){
+    return notes[row][col].grid;
+}
+function getNotesCell(row, col, number){
+    return notes[row][col].cells[number-1];
+}
+function updateNoteCell(row, col, number, value){
+    notes[row][col].cells[number-1].textContent = value;
 }
 
 // Will be Used for erase btn ....
-function eraseNumber(){
+function eraseCell(){
     // Prevent erasing a fixed cell
     if(!selectedCell.classList.contains('fixed')){
         if(isValidNumber(cellValue)){
             correctCellTracker[cellValue]--;
         }
-        selectedCell.textContent = '';
+        selectedCell.innerHTML = '';
         updateClassList(selectedCell, 'remove','wrongNumber','filled');
         setSelectedCell(selectedCell);
     }
@@ -364,8 +437,10 @@ function clearBoard(){
     for(let key in correctCellTracker){
         correctCellTracker[key] = 0;
     }
+    numberBtnEls.forEach(number => updateClassList(number, 'remove', 'hidden'))
     clearSelected();
     clearTimer();
+    clearallNotes();
 
 }
 function clearSelected(){
@@ -437,7 +512,7 @@ function displayPopup(displayType){
             updatePopupContent(
                 'Timeout icon',
                 'Time\'s UP!',
-                'Better lock next time! <br> Try Solving The puzzle before timer expires',
+                'Better luck next time! <br> Try solving the puzzle before timer expires',
                 false,
                 'Try Again',
                 'timeout',
@@ -452,7 +527,6 @@ function closePopup(callback){
     setTimeout(() => {
         updateClassList(popupPrimaryBtnEl, 'remove', 'tab');
         updateClassList(popupbackdropEl, 'add', 'hidden');
-        startNewGame();
     }, 50);
     setTimeout(()=>{
         updateClassList(popupstatusEl, 'add', 'block');
@@ -557,6 +631,8 @@ inputPanelEl.addEventListener('click',(event)=>{
         handleNumberSelection(Number(event.target.textContent));
     }
 })
+eraseBtnEl.addEventListener('click', eraseCell);
+notesBtnEl.addEventListener('click', handleTakingNotes)
 
 document.addEventListener('keydown', (event)=>{
     let key = event.key;
@@ -573,7 +649,7 @@ document.addEventListener('keydown', (event)=>{
             const pressedBtn = numberBtnEls.find(btn => Number(btn.textContent) == number);
             updateClassList(pressedBtn, 'add', 'pressed-number-btn');
         }else if(key === 'Backspace'){
-            eraseNumber();
+            eraseCell();
         }else if(key === 'ArrowUp' && selectedRow > 0){
             setSelectedCell(boardCells[selectedRow - 1][selectedCol]);
         }else if(key === 'ArrowDown' && selectedRow < 8){
@@ -583,12 +659,13 @@ document.addEventListener('keydown', (event)=>{
         }else if(key === 'ArrowRight' && selectedCol < 8){
             setSelectedCell(boardCells[selectedRow][selectedCol + 1]);
         }else if(key == ' '){
-            event.preventDefault();
             if(timerBtnEl.dataset.status == 'playing'){
                 pauseTimer();
             }else{
                 resumeTimer();
             }
+        }else if(key == 'n'){
+            handleTakingNotes();
         }
 
     }
