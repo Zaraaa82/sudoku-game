@@ -127,7 +127,25 @@ function createNotes(){
         }
     }
 }
+function loadPuzzle(){
+    dummyPuzzle.forEach((row, rowIndex)=>{
+        row.forEach((cell, colIndex)=>{
+            if(cell){
+                boardCells[rowIndex][colIndex].textContent = cell;
+                correctCellTracker[cell]++;
+                updateClassList(boardCells[rowIndex][colIndex],'add', 'fixed');
+            }
+        })
+    })
+}
 
+function selectStartingCell(){
+    let firstSelect = cellEls.find(cell=> !cell.classList.contains('fixed'));
+    setSelectedCell(firstSelect);
+}
+
+
+/*------------------------------ Game Lifecycle -----------------------------*/
 
 function startNewGame(){
     clearBoard();
@@ -143,91 +161,38 @@ function closeGame(){
     clearBoard();
 }
 
-
-// function  addBoardBorders(){
-//     boardCells.forEach((row, rowIndex) => {
-//     row.forEach((cell, colIndex) => {
-//         if (colIndex === 2 || colIndex === 5 || colIndex === 8) {
-//             updateClassList(cell,'add', 'right-border');
-//         } else if (colIndex === 0 || colIndex === 3 || colIndex === 6) {
-//             updateClassList(cell,'add', 'left-border');
-//         }
-
-//         if (rowIndex === 2 || rowIndex === 5 || rowIndex === 8) {
-//             updateClassList(cell, 'add', 'bottom-border');
-//         }else if (rowIndex === 0 || rowIndex === 3 || rowIndex === 6) {
-//             updateClassList(cell, 'add', 'top-border');
-//         }
-//     });
-//     });
-// }
-
-
-/*-------------------------- Game status Management ---------------------------*/
-// Difficulty level Management
-
-// Mistake Management
-function handleMistake(){
-    mistakesCounter++;
-    let heart = heartEls[heartEls.length - mistakesCounter];
-    heart.src = './assets/images/Lost-chance.png';
-    heart.alt = 'Remaining chance';
-    if(mistakesCounter === heartEls.length){
-        stopTimer();
-        displayPopup('Game Over');
+function clearBoard(){
+    cellEls.forEach(cell=>{
+        cell.textContent = '';
+        cell.classList = 'cell';
+    });
+    heartEls.forEach(heart => {
+        heart.src = './assets/images/Remaining-chance.png';
+        heart.alt = 'Lost Chance';
+    });
+    currentDifficulty = null; 
+    mistakesCounter = 0;
+    for(let key in correctCellTracker){
+        correctCellTracker[key] = 0;
     }
-}
+    numberBtnEls.forEach(number => updateClassList(number, 'remove', 'hidden'))
+    clearSelected();
+    clearTimer();
+    clearAllNotes();
 
-// Timer Management
-function startTimer(){
-    if (timer) 
-        return;
-    timer = setInterval(()=>{
-        time.seconds++;
-        if(time.seconds === 60){
-            time.seconds = 0;
-            time.minutes++;
-        }
-        if(time.minutes === 60){
-            stopTimer();
-            displayPopup('Timeout');
-        }
-        timeEl.textContent = formatTimer();
-    },1000);
 }
+function clearSelected(){
+    selectedCell = null;
+    selectedRow = -1;
+    selectedCol = -1;
+    cellValue = null;
 
-function pauseTimer(){
-    stopTimer();
-    timerBtnEl.dataset.status = 'paused';
-    displayPopup('Pause Timer');
+    rowCells = [];
+    colCells = [];
+    boxCells = [];
+    relatedCells = [];
+    selectedSameNumber = [];
 }
-function stopTimer(){
-    clearInterval(timer);
-    timer = null
-    timerBtnEl.src = './assets/images/play.png';
-    timerBtnEl.alt = 'Play Button';
-}
-function resumeTimer(){
-    timerBtnEl.src = './assets/images/pause.png';
-    timerBtnEl.alt = 'Pause Button'; 
-    timerBtnEl.dataset.status = 'playing'
-    startTimer();
-}
-function formatTimer(){
-    let seconds = (time.seconds < 10)? '0'+ time.seconds : time.seconds;
-    let minutes = (time.minutes < 10)? '0'+ time.minutes : time.minutes; 
-    return minutes + ':' + seconds;
-}
-function clearTimer(){
-    clearInterval(timer);
-    time.seconds = 0;
-    time.minutes = 0;
-    timer = null;
-    timerBtnEl.dataset.status = 'playing';
-    timerBtnEl.src = './assets/images/pause.png';
-    timeEl.textContent = '00:00';
-}
-
 /*-------------------------- Selection Management ---------------------------*/
 
 function handleCellClick(clickedCell){
@@ -257,7 +222,7 @@ function setSelectedCell(cell){
     updateSelectedCellHighlight('add');
 }
 
-/*------------------------- Highlight Management ---------------------------*/
+/*-------------------------- Highlight Management ---------------------------*/
 
 function updateSelectedCellHighlight(action){
     // Selected cell
@@ -297,8 +262,7 @@ function updateConflictingCellsHighlight(action){
     updateClassList(selectedCell, 'remove', 'conflicting-number');
 }
 
-/*------------------------- Related Cell Helpers ----------------------------*/
-
+/*--------------------------- Board Helpers --------------------------------*/
 function findRowCells(row,grid){
     return grid[row];
 }
@@ -326,7 +290,9 @@ function findSameNumber(number){
     selectedSameNumber = cellEls.filter(cell=> cell.textContent === number);
 }
 
-/*--------------------------- Game Actions ---------------------------------*/
+
+
+/*--------------------------- Number Management -----------------------------*/
 
 function handleNumberSelection(number){
 
@@ -339,10 +305,6 @@ function handleNumberSelection(number){
     }else{
         handleValueSelection(number);
     }    
-}
-function handleTakingNotes(){
-    isTakingNotes = !isTakingNotes;
-    notesBtnEl.classList.toggle('on');
 }
 
 function handleValueSelection(number){
@@ -368,6 +330,26 @@ function handleValueSelection(number){
     detectNumberCompletion(number);
     detectWin();
 }
+
+function eraseCell(){
+    // Prevent erasing a fixed cell
+    if(!selectedCell.classList.contains('fixed')){
+        if(isValidNumber(cellValue)){
+            correctCellTracker[cellValue]--;
+        }
+        selectedCell.innerHTML = '';
+        updateClassList(selectedCell, 'remove','wrongNumber','filled');
+        setSelectedCell(selectedCell);
+    }
+}
+
+/*---------------------------- Notes Management -----------------------------*/
+
+function handleTakingNotes(){
+    isTakingNotes = !isTakingNotes;
+    notesBtnEl.classList.toggle('on');
+}
+
 function handleNoteSelection(number){
     let noteCell = getNotesCell(selectedRow, selectedCol, number)
     // Update note cell value
@@ -388,15 +370,20 @@ function updateRelatedNotes(number){
         }
     })
 }
+
 function clearCellNotes(row, col){
     notes[row][col].cells.forEach(noteCell => noteCell.textContent = '');
 }
 
-function clearallNotes(){
+function clearAllNotes(){
     notes.forEach((row,rowIndex)=> row.forEach((cell,colIndex)=>{
         clearCellNotes(rowIndex, colIndex);
     }));
 }
+
+
+/*---------------------------- Notes Helpers -----------------------------*/
+
 function containsNotes(cell){
     return cell.firstElementChild && cell.firstElementChild.classList.contains('note-grid')
 }
@@ -410,51 +397,19 @@ function updateNoteCell(row, col, number, value){
     notes[row][col].cells[number-1].textContent = value;
 }
 
-// Will be Used for erase btn ....
-function eraseCell(){
-    // Prevent erasing a fixed cell
-    if(!selectedCell.classList.contains('fixed')){
-        if(isValidNumber(cellValue)){
-            correctCellTracker[cellValue]--;
-        }
-        selectedCell.innerHTML = '';
-        updateClassList(selectedCell, 'remove','wrongNumber','filled');
-        setSelectedCell(selectedCell);
+/*-------------------------- Game State Management --------------------------*/
+
+function handleMistake(){
+    mistakesCounter++;
+    let heart = heartEls[heartEls.length - mistakesCounter];
+    heart.src = './assets/images/Lost-chance.png';
+    heart.alt = 'Remaining chance';
+    if(mistakesCounter === heartEls.length){
+        stopTimer();
+        displayPopup('Game Over');
     }
 }
 
-function clearBoard(){
-    cellEls.forEach(cell=>{
-        cell.textContent = '';
-        cell.classList = 'cell';
-    });
-    heartEls.forEach(heart => {
-        heart.src = './assets/images/Remaining-chance.png';
-        heart.alt = 'Lost Chance';
-    });
-    currentDifficulty = null; 
-    mistakesCounter = 0;
-    for(let key in correctCellTracker){
-        correctCellTracker[key] = 0;
-    }
-    numberBtnEls.forEach(number => updateClassList(number, 'remove', 'hidden'))
-    clearSelected();
-    clearTimer();
-    clearallNotes();
-
-}
-function clearSelected(){
-    selectedCell = null;
-    selectedRow = -1;
-    selectedCol = -1;
-    cellValue = null;
-
-    rowCells = [];
-    colCells = [];
-    boxCells = [];
-    relatedCells = [];
-    selectedSameNumber = [];
-}
 function detectNumberCompletion(number){
     if(correctCellTracker[number] === 9){
         updateClassList(numberBtnEls[number-1], 'add', 'hidden');
@@ -470,7 +425,63 @@ function detectWin(){
     }
 }
 
-/*------------------------- Popup Management ----------------------------*/
+
+/*---------------------------- Timer Management -----------------------------*/
+
+function startTimer(){
+    if (timer) 
+        return;
+    timer = setInterval(()=>{
+        time.seconds++;
+        if(time.seconds === 60){
+            time.seconds = 0;
+            time.minutes++;
+        }
+        if(time.minutes === 60){
+            stopTimer();
+            displayPopup('Timeout');
+        }
+        timeEl.textContent = formatTimer();
+    },1000);
+}
+
+function stopTimer(){
+    clearInterval(timer);
+    timer = null
+    timerBtnEl.src = './assets/images/play.png';
+    timerBtnEl.alt = 'Play Button';
+}
+
+function pauseTimer(){
+    stopTimer();
+    timerBtnEl.dataset.status = 'paused';
+    displayPopup('Pause Timer');
+}
+
+function resumeTimer(){
+    timerBtnEl.src = './assets/images/pause.png';
+    timerBtnEl.alt = 'Pause Button'; 
+    timerBtnEl.dataset.status = 'playing'
+    startTimer();
+}
+
+function clearTimer(){
+    clearInterval(timer);
+    time.seconds = 0;
+    time.minutes = 0;
+    timer = null;
+    timerBtnEl.dataset.status = 'playing';
+    timerBtnEl.src = './assets/images/pause.png';
+    timeEl.textContent = '00:00';
+}
+
+function formatTimer(){
+    let seconds = (time.seconds < 10)? '0'+ time.seconds : time.seconds;
+    let minutes = (time.minutes < 10)? '0'+ time.minutes : time.minutes; 
+    return minutes + ':' + seconds;
+}
+
+/*---------------------------- Popup Management -----------------------------*/
 
 function displayPopup(displayType){
     switch(displayType){
@@ -559,6 +570,7 @@ function updatePopupContent(img,header, message, gameStatus, primaryBtn, primary
     }
 
 }
+
 function updatePopupStatus(){
     popupDifficultyEl.textContent = currentDifficulty;
 
@@ -572,6 +584,7 @@ function updatePopupStatus(){
     popupTimeEl.textContent = formatTimer(); 
 
 }
+
 function handlePopupPrimaryBtnClick(){
     updateClassList(popupPrimaryBtnEl, 'add', 'tab');
     switch(popupPrimaryBtnEl.dataset.status){
