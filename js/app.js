@@ -1,7 +1,6 @@
 /*------------------------ Cached Element References ------------------------*/
 // Board Elements
 const boardEl = document.querySelector("#board");
-// const rowEls = document.querySelectorAll(".row");
 const cellEls = [...document.querySelectorAll('.cell')];
 
 // Input Panel Elements 
@@ -26,33 +25,11 @@ const popupTimeEl = document.querySelector('#popup-time');
 /*-------------------------------- Constants --------------------------------*/
 const boardCells = []; // Store cell Elements in 2D
 const notes = [];
-const dummyPuzzle = [
-    [7, 3, '',  9, 5, '',  '','',''],
-    [2, 1, '',  6, 7, '',  5, 8, ''],
-    ['','', 5,  3, 1, '',  4,'','',],
-    
-    [1, 9, '',  '', 6, 3,  2,'','',],
-    [3, 4,  2,   1,'','',  6,'','',],
-    [5, 6,  8,   2, '',7,  '','',''],
+let puzzle = [];
 
-    ['', 2,'',  '',8, 1,   3,'',''],
-    ['','', 1,  '','', 9,  7, 6, 2],
-    ['', 7, '',  5, 2,'',  8, 1, 9]
-]
-const dummySolution = [
-  [7, 3, 4, 9, 5, 8, 1, 2, 6],
-  [2, 1, 9, 6, 7, 4, 5, 8, 3],
-  [6, 8, 5, 3, 1, 2, 4, 9, 7],
-  [1, 9, 7, 8, 6, 3, 2, 4, 5],
-  [3, 4, 2, 1, 9, 5, 6, 7, 8],
-  [5, 6, 8, 2, 4, 7, 9, 3, 1],
-  [9, 2, 6, 7, 8, 1, 3, 5, 4],
-  [8, 5, 1, 4, 3, 9, 7, 6, 2],
-  [4, 7, 3, 5, 2, 6, 8, 1, 9]
-];
+let solution = [];
 
-const solution = [];
-const puzzle = [];
+let solutionCount =0;
 
 /*---------------------------- Variables (state) ----------------------------*/
 // Selected Cell variables
@@ -89,10 +66,6 @@ let correctCellTracker = {
 
 let isTakingNotes = false;
 
-/*-------------------------------- Functions --------------------------------*/
-
-
-
 /*--------------------------- Game Initialization ---------------------------*/
 initializeGame();
 
@@ -128,7 +101,7 @@ function createNotes(){
     }
 }
 function loadPuzzle(){
-    dummyPuzzle.forEach((row, rowIndex)=>{
+    puzzle.forEach((row, rowIndex)=>{
         row.forEach((cell, colIndex)=>{
             if(cell){
                 boardCells[rowIndex][colIndex].textContent = cell;
@@ -148,11 +121,11 @@ function selectStartingCell(){
 /*------------------------------ Game Lifecycle -----------------------------*/
 
 function startNewGame(){
+    buildGame();
     clearBoard();
     loadPuzzle();
     selectStartingCell();
     startTimer();
-    currentDifficulty = 'Easy'; // will ba changed
 }
 function restartGame(){
 
@@ -170,7 +143,6 @@ function clearBoard(){
         heart.src = './assets/images/Remaining-chance.png';
         heart.alt = 'Lost Chance';
     });
-    currentDifficulty = null; 
     mistakesCounter = 0;
     for(let key in correctCellTracker){
         correctCellTracker[key] = 0;
@@ -193,6 +165,201 @@ function clearSelected(){
     relatedCells = [];
     selectedSameNumber = [];
 }
+
+
+/*------------------------- Sudoku Generation -------------------------------*/
+
+function buildGame(){
+     solution.length = 0;
+    for(let r=0; r<9; r++){
+        solution.push([]);
+        for(let c=0; c<9; c++){
+            solution[r][c] = '';
+        }
+    }
+    generateSolution(solution);
+    generatePuzzle(currentDifficulty);
+}
+
+
+// Generation:
+
+function generateSolution(board) {
+    let {row,col} = {...findFirstEmpty(board)};
+
+    if(row === -1 && col === -1){
+        return true;
+    }
+
+    let numbers = shuffledNumbers();
+
+    for(let i=0; i < numbers.length ; i++){
+        // if the number is valid Place it
+        if(isValidPlacement(board, row, col, numbers[i])){
+            board[row][col] = numbers[i];
+            if(generateSolution(board)){
+                return true;
+            }else{
+                // Backtrack if the placement result in no solution
+                board[row][col] = '';
+            }
+        }
+    }
+    // If there is no solution for current empty cell
+    return false;
+   
+}
+
+function generatePuzzle(difficulty) {
+    puzzle = copyBoard(solution);
+
+    let removeCount = 0;
+    switch(difficulty){
+        case 'Easy':
+            removeCount = 35;
+            break;
+        case 'Medium':
+            removeCount = 45;
+            break;
+        case 'Hard':
+            removeCount = 55;
+            break;
+    }
+    let positions = shuffledPositions();
+
+    // Try removing cells in random order
+    for(let {row, col} of positions){
+        let cellValue = puzzle[row][col];
+
+        // Skip empty cells
+        if(cellValue){
+
+            // Remove the cell
+            puzzle[row][col] ='';
+
+            // Check if the solution is still unique
+            solutionCount = 0;
+            countSolutions(puzzle);
+            
+            if(solutionCount === 1){
+                // Keep the cell empty
+                removeCount--;
+                if(removeCount === 0){
+                    break;
+                }
+            }else{
+                // Put the number back
+                puzzle[row][col] = cellValue;
+            }
+        }
+    }
+
+}
+
+// Uniqueness Checker:
+function countSolutions(board){
+    let {row,col} = findFirstEmpty(board);
+    
+    // Stopping Condition 
+    if(row === -1 && col === -1){
+        solutionCount++;
+        return;
+    }
+
+    for(let number = 1; number <=9  ; number++){
+        if(isValidPlacement(board, row, col, number)){
+            board[row][col] = number;
+
+            // Check all possible solutions after placing this number
+            countSolutions(board);
+
+            // Remove the number and try the next possibility
+            board[row][col] = '';
+
+            // Stop if another solution has already been found
+            if(solutionCount >= 2){
+                return;
+            }
+            
+        }
+    }
+}
+
+// Generation Helpers:
+
+function findFirstEmpty(board){
+    for(let row=0; row<9 ; row++){
+        for(let col=0; col<9 ; col++){
+            if(board[row][col] === ''){
+                return {row: row, col:col};
+            }
+        }
+    }
+    return {row:-1, col:-1};
+}
+
+function isValidPlacement(board, row, col, number) {
+    const boxStartRow = Math.floor(row/3) * 3;
+    const boxStartCol = Math.floor(col/3) * 3;
+
+    const isValidRow = !board[row].includes(number);
+    const isValidCol = board.every(row => row[col] !== number);
+    const isValidBox = true;
+
+    for(let r = boxStartRow ; r < (boxStartRow + 3) ; r++){
+        for(let c = boxStartCol ; c < (boxStartCol + 3) ; c++){
+            if(board[r][c] === number)
+                return false;
+        }
+    }
+
+    return isValidRow && isValidCol && isValidBox;
+
+}
+
+function copyBoard(board){
+    let copyBoard = [];
+    board.forEach((row, rowIndex)=>{
+        copyBoard.push([...board[rowIndex]]);
+    })
+    return copyBoard;
+}
+
+
+// Randomization:
+
+function shuffledNumbers() {
+    let array = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    let shuffledArray = [];
+
+    for(let i=0; i< 9; i++){
+        let index = randomNumber(array.length);
+        shuffledArray.push(...array.splice(index,1));
+    }
+
+    return shuffledArray;
+}
+
+function shuffledPositions(){
+    let positions = [];
+    let shuffledPositions = [];
+    for(let r=0; r< 9; r++){
+        for(let c=0; c< 9; c++){
+            positions.push({row: r, col: c});
+        }
+    }
+    for(let r=0; r< 81; r++){
+        let index = randomNumber(positions.length);
+        shuffledPositions.push(...positions.splice(index, 1))
+    }
+    return shuffledPositions;
+}
+
+function randomNumber(length){
+    return Math.floor(Math.random() * length)
+}
+
+
 /*-------------------------- Selection Management ---------------------------*/
 
 function handleCellClick(clickedCell){
@@ -245,7 +412,7 @@ function  updateRelatedCellsHighlight(action) {
 }
 
 function updateSameNumberHighlight(action){
-    selectedSameNumber.forEach(cell => updateClassList(cell, action,'same-Number-color'));
+    selectedSameNumber.forEach(cell => updateClassList(cell, action,'same-number-color'));
 }
 
 function updateConflictingCellsHighlight(action){
@@ -257,7 +424,7 @@ function updateConflictingCellsHighlight(action){
     if(!cellValue)
         return;
 
-    let conflictingCells = relatedCells.filter(cell => Number(cell.textContent) === cellValue);
+    let conflictingCells = relatedCells.filter(cell => !containsNotes(cell) && Number(cell.textContent) === cellValue);
     conflictingCells.forEach(cell => updateClassList(cell, 'add', 'conflicting-number'));
     updateClassList(selectedCell, 'remove', 'conflicting-number');
 }
@@ -287,7 +454,7 @@ function findSameNumber(number){
         selectedSameNumber = [];
         return;
     }
-    selectedSameNumber = cellEls.filter(cell=> cell.textContent === number);
+    selectedSameNumber = cellEls.filter(cell=> !containsNotes(cell) && cell.textContent === number);
 }
 
 
@@ -314,14 +481,14 @@ function handleValueSelection(number){
         selectedCell.innerHTML = number;
 
         if (!isValidNumber(number)) {
-            updateClassList(selectedCell, 'add', 'wrongNumber');
+            updateClassList(selectedCell, 'add', 'wrong-number');
             updateClassList(selectedCell, 'remove', 'filled');
             handleMistake();
         } 
         else {
             correctCellTracker[number]++;
             updateRelatedNotes(number);
-            updateClassList(selectedCell, 'remove', 'wrongNumber');
+            updateClassList(selectedCell, 'remove', 'wrong-number');
             updateClassList(selectedCell, 'add', 'filled');
         }
         setSelectedCell(selectedCell);
@@ -337,8 +504,9 @@ function eraseCell(){
         if(isValidNumber(cellValue)){
             correctCellTracker[cellValue]--;
         }
+        clearCellNotes(selectedRow, selectedCol);
         selectedCell.innerHTML = '';
-        updateClassList(selectedCell, 'remove','wrongNumber','filled');
+        updateClassList(selectedCell, 'remove','wrong-number','filled');
         setSelectedCell(selectedCell);
     }
 }
@@ -358,7 +526,8 @@ function handleNoteSelection(number){
     }else{
         noteCell.textContent = number;
     }
-    // Render note grid
+    updateClassList(selectedCell, 'remove', 'wrong-number', 'filled');
+
     selectedCell.replaceChildren(getNotesGrid(selectedRow, selectedCol));
 }
 
@@ -598,7 +767,7 @@ function handlePopupPrimaryBtnClick(){
             closePopup(startNewGame);
         break;
         case 'timeout':
-            restartGame();
+            closePopup(restartGame);
         break;   
     }       
 }
@@ -623,7 +792,7 @@ function handlePopupSecondaryBtnClick(){
 /*---------------------------- Validation ----------------------------------*/
 
 function isValidNumber(number){
-    return number === dummySolution[selectedRow][selectedCol];
+    return number === solution[selectedRow][selectedCol];
 }
 
 /*------------------------------ Helper Functions ---------------------------*/
@@ -694,5 +863,10 @@ document.addEventListener('keyup', (event)=>{
 
 popupPrimaryBtnEl.addEventListener('click', handlePopupPrimaryBtnClick);
 popupSecondaryBtnEl.addEventListener('click', handlePopupSecondaryBtnClick)
-timerBtnEl.addEventListener('click', pauseTimer);
+timerBtnEl.addEventListener('click', ()=>{
+    if (timerBtnEl.dataset.status === 'playing')
+        pauseTimer();
+    else
+        resumeTimer();
+});
      

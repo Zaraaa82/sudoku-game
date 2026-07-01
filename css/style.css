@@ -32,13 +32,13 @@
   --error-color: rgb(249, 40, 40);
   --error-light-color: rgb(249, 207, 217);
   --row-col-color: rgba(238, 231, 250, 0.934);
-  --same-Number-color: #d6c5eb;
+  --same-number-color: #d6c5eb;
 
   /* Text */
   --text-primary-color: rgb(50, 48, 70);
   --text-secondary-color: #586878;
   --text-Inverse-color: rgb(255, 255, 255);
-  --tect-note-color: rgb(88, 78, 114);
+  --text-note-color: rgb(88, 78, 114);
 
   /* Box shadow */
   --box-shadow01: 0px 2px 8px rgba(155, 155, 155, 0.2);
@@ -68,14 +68,14 @@ body {
   height: 100vh;
 
   background-color: var(--background-color);
-  font-family: "Nunito", sans-serif, serif, system-ui, "Helvetica Neue";
+  font-family: "Nunito", system-ui, "Helvetica Neue",sans-serif;
 }
 h1 {
   font-size: 24px;
 }
 button{
   all: unset;
-  font-family: "Nunito", sans-serif, serif, system-ui, "Helvetica Neue";
+  font-family: "Nunito", system-ui, "Helvetica Neue",sans-serif;
   font-weight: 700;
 }
 
@@ -149,7 +149,7 @@ main {
   color: var(--filling-color);
 
   border: 1.5px solid var(--border-cell-color);
-  transition: scale 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out;
 }
 
 .cell:active {
@@ -188,11 +188,11 @@ main {
 .related-cell {
   background-color: var(--row-col-color);
 }
-.same-Number-color {
-  background-color: var(--same-Number-color);
+.same-number-color {
+  background-color: var(--same-number-color);
 }
 
-.wrongNumber{
+.wrong-number{
   color: var(--error-color);
 }
 .conflicting-number{
@@ -342,9 +342,7 @@ p.status-label{
   margin-right: 5px;
   height: 0.9rem;
 }
-#instruction-container{
- 
-}
+
 #instructions{
   color: var(--text-secondary-color);
   border-radius: 5px;
@@ -370,15 +368,13 @@ p.status-label{
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--box-shadow01);
   background-color: var(--card-color);
-  /* border: var(--soft-border-color) 1px solid; */
   border: var(--soft-border-color) 1.5px solid;
   box-shadow: var(--box-shadow05);
   border-radius: 50px;
   text-align: center;
   aspect-ratio: 1;
-  transition: all 0.3 ease-in-out;
+  transition: all 0.2s ease-in-out;
   cursor: pointer;
 }
 .number-btn:active, .pressed-number-btn{
@@ -414,7 +410,7 @@ p.status-label{
   background-color: var(--popup-background-color);
   padding: 2rem;
   border-radius: 12px;
-  width: 35vw;
+  width: min(90vw, 420px);
   min-width: 200px;
   text-align: center;
 }
@@ -454,7 +450,7 @@ p.status-label{
   font-size: calc(3rem/4);
   margin-top: 15px;
   border: var(--btn-primary-color) 2px solid;
-  transform: all 0.2 ease-in-out;
+  transform: all .2s ease-in-out;
   cursor: pointer;
 }
 #popup-primary-btn{
@@ -470,7 +466,7 @@ p.status-label{
   background-color: var(--btn-secondary-hover);
 }
 #popup-secondary-btn:active{
-  background-color: var(--secondary-btn-active);
+  background-color: var(--btn-secondary-active);
 }
 
 #popup-primary-btn:hover{
@@ -525,7 +521,7 @@ p.status-label{
   display: flex;
   justify-content: center;
   align-items: center;
-  color: var(--tect-note-color);
+  color: var(--text-note-color);
   font-size: 0.35rem;
 }
 
@@ -552,6 +548,7 @@ p.status-label{
   }
   #game-controls{
     width: 100%;
+    flex-direction: row;
   }
 
   #popup-message{
