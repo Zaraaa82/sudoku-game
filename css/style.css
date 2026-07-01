@@ -206,6 +206,14 @@ main {
 .filled {
   color: var(--filling-color);
 }
+@keyframes shake{
+  0%, 100%  {transform: translateX(0);}
+  20%, 60% {transform: translateX(2px);}
+  40%, 80% {transform: translateX(-2px);}
+}
+.shake{
+  animation: shake 0.3s ease;
+}
 /*-------------------------------- Game status -----------------------------*/
 
 #game-status{

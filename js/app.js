@@ -465,6 +465,11 @@ function handleNumberSelection(number){
 
     if(selectedCell.classList.contains('fixed')){
         // shake animation or give a message
+        selectedCell.classList.remove('shake');
+        selectedCell.classList.add('shake');
+        setTimeout(() => {
+            selectedCell.classList.remove('shake');
+        }, 300);
         return;
     }
     if(isTakingNotes){
