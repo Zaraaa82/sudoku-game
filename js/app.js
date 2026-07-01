@@ -529,6 +529,12 @@ function eraseCell(){
         selectedCell.innerHTML = '';
         updateClassList(selectedCell, 'remove','wrong-number','filled');
         setSelectedCell(selectedCell);
+    }else{
+        selectedCell.classList.remove('shake');
+        selectedCell.classList.add('shake');
+        setTimeout(() => {
+            selectedCell.classList.remove('shake');
+        }, 300);
     }
 }
 
@@ -891,7 +897,7 @@ popupSecondaryBtnEl.addEventListener('click', handlePopupSecondaryBtnClick)
 document.addEventListener('keydown', (event)=>{
     let key = event.key;
     // Prevent udpating the board when popup is display
-    if(!popupbackdropEl.classList.contains('hidden')){
+    if(!popupbackdropEl.classList.contains('hidden') || !startScreenEl.classList.contains('hidden') || !difficultyBackdrop.classList.contains('hidden')){
         if(key == ' '){
             event.preventDefault();
             handlePopupPrimaryBtnClick();
