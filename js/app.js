@@ -1,4 +1,15 @@
 /*------------------------ Cached Element References ------------------------*/
+// Start Screen
+const startScreenEl = document.querySelector('#start-screen');
+const startScreenBtnEl = document.querySelector('#start-Screen-btn');
+// Header controllers
+const restartBtnEl = document.querySelector('#restart-game-btn');
+const NewGametnEl = document.querySelector('#new-game-btn');
+
+// Levels elements
+const difficultyBackdrop = document.querySelector('#difficulty-backdrop');
+const levelsEl = document.querySelector('.levels');
+
 // Board Elements
 const boardEl = document.querySelector("#board");
 const cellEls = [...document.querySelectorAll('.cell')];
@@ -8,6 +19,7 @@ const inputPanelEl = document.querySelector('#input-panel');
 const numberBtnEls = [...document.querySelectorAll(".number-btn")];
 
 // Status Elements
+const difficultyEl = document.querySelector('#difficulty-status');
 const heartEls = [...document.querySelectorAll(' .heart.chance')];
 const [timeEl, timerBtnEl] = [...document.querySelectorAll('#timer-control *')]
 
@@ -44,7 +56,7 @@ let relatedCells = [];
 let selectedSameNumber = [];
 
 // Game status Variables
-let currentDifficulty = 'Easy'; // will be changed later
+let currentDifficulty; // will be changed later
 let mistakesCounter = 0;
 let timer = null;
 let time = {
@@ -71,8 +83,7 @@ initializeGame();
 
 function initializeGame(){
     fetchCells();
-    createNotes()
-    startNewGame();
+    createNotes();
 }
 /*------------------------------- Game Setup -------------------------------*/
 
@@ -118,9 +129,11 @@ function selectStartingCell(){
 }
 
 
+
 /*------------------------------ Game Lifecycle -----------------------------*/
 
-function startNewGame(){
+
+function beginGame() {
     buildGame();
     clearBoard();
     loadPuzzle();
@@ -128,10 +141,13 @@ function startNewGame(){
     startTimer();
 }
 function restartGame(){
-
+    clearBoard();
+    loadPuzzle();
+    selectStartingCell();
+    startTimer();
 }
 function closeGame(){
-    clearBoard();
+    manageStartScreen('remove');
 }
 
 function clearBoard(){
@@ -763,13 +779,13 @@ function handlePopupPrimaryBtnClick(){
     updateClassList(popupPrimaryBtnEl, 'add', 'tab');
     switch(popupPrimaryBtnEl.dataset.status){
         case 'mistakes':
-            closePopup(startNewGame);               
+            closePopup(openDifficultyScreen);               
         break;
         case 'unpause': 
             closePopup(resumeTimer)
         break;
         case 'win':
-            closePopup(startNewGame);
+            closePopup(openDifficultyScreen);
         break;
         case 'timeout':
             closePopup(restartGame);
@@ -780,7 +796,7 @@ function handlePopupPrimaryBtnClick(){
 function handlePopupSecondaryBtnClick(){
     switch(popupSecondaryBtnEl.dataset.status){
         case 'New Game':
-            closePopup(startNewGame);
+            closePopup(openDifficultyScreen);
         break;
         case 'Close':
             closePopup(closeGame);
@@ -789,6 +805,30 @@ function handlePopupSecondaryBtnClick(){
 
 }
 
+/*-------------------------- Screen Management --------------------------*/
+function openDifficultyScreen(){
+    manageLevelScreen('remove');
+}
+
+function handleDifficultySelection(event) {
+    if (event.target.classList.contains('level-btn')){
+        const level = event.target;
+    
+        currentDifficulty = level.dataset.difficulty;
+        difficultyEl.textContent = currentDifficulty;
+        
+        manageLevelScreen('add');
+        manageStartScreen('add');
+        beginGame();
+    } 
+}
+
+function manageLevelScreen(action) {
+    updateClassList(difficultyBackdrop, action, 'hidden');
+}
+function manageStartScreen(action) {
+    updateClassList(startScreenEl, action, 'hidden');
+}
 
 
 
@@ -809,18 +849,45 @@ function updateClassList(element, action, ...className){
 
 
 /*----------------------------- Event Listeners -----------------------------*/
+// Start Screen
+startScreenBtnEl.addEventListener('click', openDifficultyScreen);
+
+// Difficulty Screen
+levelsEl.addEventListener('click', handleDifficultySelection);
+
+NewGametnEl.addEventListener('click', openDifficultyScreen);
+
+// Header
+restartBtnEl.addEventListener('click', restartGame);
+
+// Board
 boardEl.addEventListener('click', event=>{
     if (event.target.classList.contains("cell"))
         handleCellClick(event.target); 
 })
+
+// Input Panel
 inputPanelEl.addEventListener('click',(event)=>{
     if(event.target.classList.contains('number-btn')){
         handleNumberSelection(Number(event.target.textContent));
     }
 })
+// Controllers
 eraseBtnEl.addEventListener('click', eraseCell);
 notesBtnEl.addEventListener('click', handleTakingNotes)
+// Timer
+timerBtnEl.addEventListener('click', ()=>{
+    if (timerBtnEl.dataset.status === 'playing')
+        pauseTimer();
+    else
+        resumeTimer();
+});
 
+// Popup
+popupPrimaryBtnEl.addEventListener('click', handlePopupPrimaryBtnClick);
+popupSecondaryBtnEl.addEventListener('click', handlePopupSecondaryBtnClick)
+
+// Keyboard
 document.addEventListener('keydown', (event)=>{
     let key = event.key;
     // Prevent udpating the board when popup is display
@@ -838,14 +905,19 @@ document.addEventListener('keydown', (event)=>{
         }else if(key === 'Backspace'){
             eraseCell();
         }else if(key === 'ArrowUp' && selectedRow > 0){
+            event.preventDefault();
             setSelectedCell(boardCells[selectedRow - 1][selectedCol]);
         }else if(key === 'ArrowDown' && selectedRow < 8){
+            event.preventDefault();
             setSelectedCell(boardCells[selectedRow + 1][selectedCol]);
         }else if(key === 'ArrowLeft' && selectedCol > 0){
+            event.preventDefault();
             setSelectedCell(boardCells[selectedRow][selectedCol - 1]);
         }else if(key === 'ArrowRight' && selectedCol < 8){
+            event.preventDefault();
             setSelectedCell(boardCells[selectedRow][selectedCol + 1]);
         }else if(key == ' '){
+            event.preventDefault();
             if(timerBtnEl.dataset.status == 'playing'){
                 pauseTimer();
             }else{
@@ -866,12 +938,9 @@ document.addEventListener('keyup', (event)=>{
      }
 })
 
-popupPrimaryBtnEl.addEventListener('click', handlePopupPrimaryBtnClick);
-popupSecondaryBtnEl.addEventListener('click', handlePopupSecondaryBtnClick)
-timerBtnEl.addEventListener('click', ()=>{
-    if (timerBtnEl.dataset.status === 'playing')
-        pauseTimer();
-    else
-        resumeTimer();
-});
-     
+
+
+
+
+
+

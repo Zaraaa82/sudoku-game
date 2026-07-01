@@ -8,6 +8,7 @@
   --primary-hover-color: rgb(173, 147, 244);
   --primary-active-color: rgb(189, 147, 244);
   --accent-color: rgb(255, 214, 231);
+  --accent-dark-color: rgb(183, 62, 112);
   --accent-light-color: rgb(255, 234, 241);
   --background-color: rgb(251, 247, 254);
   --card-color: rgb(255, 255, 255);
@@ -20,10 +21,12 @@
   --btn-secondary-background-color: transparent;
   --btn-secondary-hover:rgba(241, 97, 145, 0.129);
   --btn-secondary-active:rgba(241, 97, 145, 0.226);
-  --popup-background-color:rgb(255, 255, 255);
-  --soft-border-color: #F3F0FA;
-  --erase-btn: #F4699D;
+  --card-background:rgb(255, 255, 255);
+  --soft-border-color: rgb(243, 240, 250);
+  --erase-btn: rgb(244, 105, 157);
   --note-btn-active: rgba(237, 205, 255, 0.16);
+  --btn-primary-border-color: rgb(220, 63, 121);
+  --level-active-color: rgb(252, 220, 231);
 
 
   /* State */
@@ -32,11 +35,11 @@
   --error-color: rgb(249, 40, 40);
   --error-light-color: rgb(249, 207, 217);
   --row-col-color: rgba(238, 231, 250, 0.934);
-  --same-number-color: #d6c5eb;
+  --same-number-color: rgb(214, 197, 235);
 
   /* Text */
   --text-primary-color: rgb(50, 48, 70);
-  --text-secondary-color: #586878;
+  --text-secondary-color: rgb(88, 104, 120);
   --text-Inverse-color: rgb(255, 255, 255);
   --text-note-color: rgb(88, 78, 114);
 
@@ -46,7 +49,7 @@
   --box-shadow03: 0px 0 8px var(--primary-active-color);
   --box-shadow04: 0px 0px 10px var(--error-color);
   --box-shadow05: 0px 0px 5px rgba(155, 155, 155, 0.2);
-  --box-shadow06: 0px 0px 5px #F4699D;
+  --box-shadow06: 0px 0px 5px rgb(244, 105, 157);
 
 }
 /*-------------------------------- Global Styles ----------------------------*/
@@ -54,6 +57,7 @@
   -webkit-tap-highlight-color: transparent;
   transition: all 0.2s ease-in-out;
   box-sizing: border-box;
+  font-family: "Nunito", system-ui, "Helvetica Neue",sans-serif;
 }
 html {
   font-size: 24px;
@@ -68,23 +72,226 @@ body {
   height: 100vh;
 
   background-color: var(--background-color);
-  font-family: "Nunito", system-ui, "Helvetica Neue",sans-serif;
+  /* font-family: "Nunito", system-ui, "Helvetica Neue",sans-serif; */
 }
 h1 {
   font-size: 24px;
 }
+
 button{
   all: unset;
-  font-family: "Nunito", system-ui, "Helvetica Neue",sans-serif;
+  /* font-family: "Nunito", system-ui, "Helvetica Neue",sans-serif; */
   font-weight: 700;
 }
 
 /*-------------------------------- Layout -----------------------------------*/
 header {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
   gap: 15px;
+  width: 100%;
+  padding: 0 2rem 0.1rem;
+  margin-bottom: 0.1rem;
+  max-width: 700px;
+}
+#header-actions{
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+}
+#header-actions div{
+  border: var(--primary-color) 1.5px solid;
+  border-radius: 10px;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
 }
 
+/*-------------------------------- start Screen -----------------------------------*/
+#start-screen {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 2rem;
+
+  background-image: url(../assets/images/start\ screen\ Background.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+  z-index: 2000;
+}
+
+#start-card{
+  width: min(90vw, 420px);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+
+  padding: 2rem;
+
+  background: var(--card-background);
+  backdrop-filter: blur(8px);
+
+  border-radius: 18px;
+
+  box-shadow: var(--box-shadow01);
+}
+
+
+#game-logo{
+  width: 5rem;
+  height: 5rem;
+}
+
+#start-card h1{
+  margin: 0;
+  font-size: 2rem;
+  color: var(--primary-color);
+  font-weight: 800;
+}
+
+.title-divider{
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.title-divider::before,
+.title-divider::after{
+  content: "";
+  flex: 1;
+  height: 2px;
+  background-color: var(--primary-light-color);
+  border-radius: 100px;
+}
+
+.title-divider span{
+  margin: 0 1rem;
+  color: var(--primary-color);
+  font-size: 1rem;
+}
+
+#start-message{
+  margin: 0 0 0.8rem;
+
+  color: var(--text-secondary-color);
+
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+}
+
+#start-Screen-btn{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 90%;
+  gap: 0.5rem;
+  padding: 0.8rem 1rem;
+
+  background-color: var(--btn-primary-color);
+  color: var(--btn-text-color);
+
+  border-radius: 100px;
+  border-bottom: var(--btn-primary-border-color) 4px solid;
+
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: center;
+
+  box-shadow: var(--box-shadow01);
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+#start-Screen-btn:hover{
+  transform: translateY(-2px);
+  filter: brightness(0.96);
+}
+
+#start-Screen-btn:active{
+  transform: scale(0.98);
+  filter: brightness(0.9);
+}
+#start-Screen-btn img{
+  height: 1.3rem;
+}
+/*-------------------------------- Difficulty Level Screen -----------------------------------*/
+#difficulty-level-screen{
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  width: min(90vw, 380px);
+
+  padding: 2rem;
+
+  background: var(--card-background);
+  backdrop-filter: blur(8px);
+
+  border: 1.5px solid var(--soft-border-color);
+  border-radius: 18px;
+
+  box-shadow: var(--box-shadow01);
+}
+#difficulty-level-screen h2{
+  margin: 0;
+  color: var(--primary-color);
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.level-subtitle{
+  margin: 0.1rem 0 0;
+  text-align: center;
+  color: var(--text-secondary-color);
+  font-size: 0.8rem;
+}
+.levels{
+  display: flex;
+  flex-direction: column;
+  border-radius: 25px;
+}
+
+.level-btn:first-child{
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.level-btn:last-child{
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+.level-btn{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 0.5rem;
+  color: var(--text-primary-color);
+  border: 1.5px solid var(--soft-border-color);
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.level-btn:hover{
+  background-color: var(--accent-light-color);
+  color: var(--accent-dark-color);
+}
+.level-btn:active{
+  background-color: var(--level-active-color);
+  filter: brightness(0.95);
+}
 main {
   /* height: 80%;
   width: 80%; */
@@ -393,7 +600,7 @@ p.status-label{
 }
 
 /*-------------------------------- Popup -----------------------------*/
-#popup-backdrop {
+#popup-backdrop, #difficulty-backdrop {
   position: fixed;
   inset: 0;
   
@@ -404,18 +611,18 @@ p.status-label{
   background: rgba(76, 76, 76, 0.3);
   backdrop-filter: blur(2px);
   
-  z-index: 1000;
+  z-index: 3000;
   opacity: 1;
   transition: all 0.3s ease-in-out;
 
 }
-#popup {
+#popup{
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 1rem;
-  background-color: var(--popup-background-color);
+  background-color: var(--card-background);
   padding: 2rem;
   border-radius: 12px;
   width: min(90vw, 420px);
@@ -441,7 +648,7 @@ p.status-label{
   color: var(--text-secondary-color);
   font-style: italic;
 }
-.hidden#popup-backdrop, .hidden#popup-status, .hidden{
+.hidden#popup-backdrop, .hidden#popup-status, .hidden, .hidden#difficulty-backdrop{
   opacity: 0;
   pointer-events: none;
 }
@@ -543,6 +750,9 @@ p.status-label{
 @media (425px < width <= 768px) {
   html {
     font-size: 20px;
+  }
+  #start-card h1{
+    font-size: 1.7rem;
   }
 }
 @media (656px >= width) {

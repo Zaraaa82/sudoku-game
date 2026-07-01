@@ -11,21 +11,46 @@
 <body>
     <header>
         <!-- Title -->
-        <h1>SUDOKU</h1>
+        <h1 id="sudoku-title">SUDOKU</h1>
         <!-- New game & light/dark mode controllers -->
         <div id ="header-actions">
-            <div id = "theme-btn" class="header-btn"></div>
-            <div id = "new-game-btn" class="header-btn"></div>
+            <div id = "restart-game-btn" class="header-btn">↻ Restart</div>
+            <div id = "new-game-btn" class="header-btn">+ New Game</div>
         </div>
 
     </header>
     <main>
+          <div id="start-screen" class="">
+               <div id="start-card">
+                    <img id="game-logo" src="./assets/images/sudoku icon.png" alt="SUDOKU icon">
+                    <h1>SUDOKU</h1>
+                    <div class="title-divider">
+                         <span>✦</span>
+                    </div>
+                    <p id="start-message">Select a level to begin the game</p>
+                    <button id="start-Screen-btn">
+                         <img src="./assets/images/dice.png" alt="Dice">
+                         Start Game
+                    </button>
+               </div>
+          </div>
+          <div id="difficulty-backdrop" class="backdrop hidden">
+               <div id="difficulty-level-screen">
+                    <h2>Select Level</h2>
+                    <p class="level-subtitle">Select the challenge that suits you best.</p>
+                    <div class="levels">
+                         <div id="Easy-btn" class="level-btn" data-difficulty="Easy">Easy</div>
+                         <div id="Medium-btn" class="level-btn" data-difficulty="Medium">Medium</div>
+                         <div id="Hard-btn" class="level-btn" data-difficulty="Hard">Hard</div>
+                    </div>
+               </div>
+          </div>
         <div id="game-panel">
 
             <div id="game-status">
                <div class="status-container">
                     <p class="status-label">Level</p>
-                    <div>Easy</div>
+                    <div id="difficulty-status">Easy</div>
                </div>
                <div id="mistakes-control" class="status-container">
                     <p class="status-label">Mistakes</p>
